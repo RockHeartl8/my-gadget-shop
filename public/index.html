@@ -206,6 +206,77 @@
                 showCancelButton: true, confirmButtonText: 'ชำระเงิน'
             });
         }
+// อัปเกรดระบบตะกร้าสินค้าและการชำระเงิน
+        function showCartItems() {
+            if (cart.length === 0) return Swal.fire('ตะกร้าว่างเปล่า', '', 'info');
+            
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            
+            Swal.fire({
+                title: '🛒 ตะกร้าสินค้าของคุณ',
+                html: `
+                    <div style="text-align:left; max-height:300px; overflow-y:auto; margin-bottom:15px;">
+                        ${cart.map((i, idx) => `
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                                <span style="font-size:0.9rem;">${idx + 1}. ${i.name}</span>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <b>${i.price.toLocaleString()}฿</b>
+                                    <i class="fa-solid fa-trash" onclick="removeFromCart(${idx})" style="color:#f43f5e; cursor:pointer;"></i>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <h3 style="text-align:right; color:var(--deep-blue); border-top: 2px solid var(--accent-blue); padding-top:10px;">
+                        ยอดรวมทั้งสิ้น: ${total.toLocaleString()} ฿
+                    </h3>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'ชำระเงินทั้งหมด',
+                cancelButtonText: 'เลือกสินค้าต่อ',
+                confirmButtonColor: '#6366f1',
+                cancelButtonColor: '#94a3b8'
+            }).then((result) => {
+                // เมื่อผู้ใช้กดปุ่ม 'ชำระเงินทั้งหมด'
+                if (result.isConfirmed) {
+                    processPayment(total);
+                }
+            });
+        }
+
+        // ฟังก์ชันประมวลผลการชำระเงินพร้อมแจ้งเตือนสำเร็จ
+        function processPayment(amount) {
+            Swal.fire({
+                title: 'ยืนยันการชำระเงิน?',
+                text: `คุณต้องการชำระเงินรวมทั้งสิ้น ${amount.toLocaleString()} บาท ใช่หรือไม่?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'ใช่, ยืนยันการสั่งซื้อ',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonColor: '#0ea5e9'
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    // จำลองขั้นตอนการชำระเงิน
+                    Swal.fire({
+                        title: 'กำลังตรวจสอบยอดชำระ...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading() }
+                    });
+
+                    setTimeout(() => {
+                        Swal.fire({
+                            title: 'ชำระเงินสำเร็จ!',
+                            text: 'RockyStore ได้รับยอดชำระของคุณแล้ว ขอบคุณที่ใช้บริการครับ',
+                            icon: 'success'
+                        }).then(() => {
+                            // ล้างข้อมูลในตะกร้าหลังชำระเงินสำเร็จ
+                            cart = [];
+                            document.getElementById('cart-count').innerText = '0';
+                            updateUI('all'); // รีเฟรชหน้าจอ
+                        });
+                    }, 1500); // จำลองเวลาประมวลผล 1.5 วินาที
+                }
+            });
+        }
 
         window.removeFromCart = function(index) {
             cart.splice(index, 1);
