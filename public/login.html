@@ -33,26 +33,50 @@
             document.getElementById('toggle-text').innerText = isLogin ? 'ยังไม่มีบัญชี? สมัครสมาชิก' : 'มีบัญชีอยู่แล้ว? เข้าสู่ระบบ';
         }
 
-        async function handleAuth() {
-            const user = { username: document.getElementById('username').value, password:  document.getElementById('password').value };
-            const endpoint = isLogin ? '/api/login' : '/api/register';
-            
-            const res = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(user)
-            });
-            const data = await res.json();
+  async function handleAuth() {
+    const user = { 
+        username: document.getElementById('username').value, 
+        password: document.getElementById('password').value 
+    };
+    const endpoint = isLogin ? '/api/login' : '/api/register';
+    
+    try {
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        });
+        const data = await res.json();
 
-            if (res.ok) {
-                Swal.fire('สำเร็จ!', data.message, 'success').then(() => {
-                    if (isLogin) {
-                        localStorage.setItem('user', JSON.stringify(data));
-                        window.location.href = '/'; // กลับหน้าหลัก
-                    } else { toggleForm(); }
-                });
-            } else { Swal.fire('ผิดพลาด', data.message, 'error'); }
+        if (res.ok) {
+            Swal.fire({
+                title: 'สำเร็จ!',
+                text: data.message,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                if (isLogin) {
+                    // เก็บข้อมูล User ไว้ในเครื่อง
+                    localStorage.setItem('user', JSON.stringify(data));
+
+                    // --- ส่วนตัดสินใจแยกหน้า (Redirect Logic) ---
+                    if (data.role === 'admin') {
+                        window.location.href = '/admin.html'; // ส่งแอดมินไปหน้าจัดการของ
+                    } else {
+                        window.location.href = '/index.html'; // ส่งลูกค้าไปหน้าเลือกซื้อของ
+                    }
+                } else {
+                    toggleForm(); // สมัครเสร็จให้สลับมาหน้า Login
+                }
+            });
+        } else {
+            Swal.fire('ผิดพลาด', data.message, 'error');
         }
+    } catch (err) {
+        Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+    }
+}
     </script>
 </body>
 </html>
