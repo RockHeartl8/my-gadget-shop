@@ -3,21 +3,22 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 
+// --- 1. Middleware (ส่วนการตั้งค่า) ---
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static('public')); // เปิดทางให้เข้าถึงโฟลเดอร์ public ได้ทันที
 
-// เชื่อมต่อฐานข้อมูล (แบบจำลอง)
+// --- 2. การเชื่อมต่อฐานข้อมูล ---
 const mongoURI = "mongodb+srv://admin:RockHeart_2548@cluster0.hnhzatk.mongodb.net/shopDB?retryWrites=true&w=majority";
 mongoose.connect(mongoURI)
     .then(() => console.log("เชื่อมต่อฐานข้อมูล Cloud สำเร็จแล้ว!"))
     .catch(err => console.error("เชื่อมต่อไม่สำเร็จเพราะ: ", err));
 
-// 1. Model สำหรับสมาชิก (วางทับของเดิมเพื่อเพิ่มระบบ User และสต็อก)
+// --- 3. Models (โครงสร้างข้อมูล) ---
 const User = mongoose.model('User', {
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, default: 'user' }, // 'admin' หรือ 'user'
+    role: { type: String, default: 'user' },
     cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] 
 });
 
@@ -25,30 +26,26 @@ const Product = mongoose.model('Product', {
     name: String,
     price: Number,
     img: String,
-    stock: { type: Number, default: 10 } // เพิ่มจำนวนของในคลัง
+    stock: { type: Number, default: 10 }
 });
 
-// ก๊อปปี้ส่วนนี้ไปทับ app.get ตัวเก่าใน server.js (ประมาณบรรทัดที่ 18-27)
+// --- 4. API Routes (ส่วนการทำงาน) ---
+
+// ดึงข้อมูลสินค้า
 app.get('/api/products', async (req, res) => {
     try {
-        const products = await Product.find(); // ดึงข้อมูลจาก MongoDB ของจริง
+        const products = await Product.find();
         res.json(products);
     } catch (err) {
         res.status(500).json({ message: "เกิดข้อผิดพลาดในการดึงข้อมูล" });
     }
 });
 
-// เพิ่ม API สำหรับเพิ่มสินค้าใหม่ (ใช้ทดสอบ) 
-// วางแทนที่บรรทัดสุดท้ายเดิม เพื่อให้ Server บน Cloud กำหนด Port เองได้
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-
-    // --- ระบบสมัครสมาชิก และ Login ---
+// สมัครสมาชิก
 app.post('/api/register', async (req, res) => {
     try {
         const { username, password } = req.body;
-        const newUser = new User({ username, password }); // ในงานจริงควรแฮชรหัสผ่านด้วย bcrypt
+        const newUser = new User({ username, password });
         await newUser.save();
         res.status(201).json({ message: "สมัครสมาชิกสำเร็จ!" });
     } catch (err) {
@@ -56,6 +53,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
+// เข้าสู่ระบบ
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ username, password });
@@ -66,10 +64,9 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// --- ระบบแจ้งเตือนการซื้อ (สั่งซื้อจำลอง) ---
+// แจ้งเตือนการซื้อ
 app.post('/api/purchase', (req, res) => {
     res.json({ status: "success", message: "ซื้อสินค้าสำเร็จ! แจ้งเตือนไปยังระบบจัดการแล้ว" });
-    // เพิ่มบรรทัดนี้เพื่อให้ Server เข้าถึงหน้า login.html ในโฟลเดอร์ public ได้
-app.use(express.static('public'));
 });
-});
+
+// --- 5. Start Server ---
