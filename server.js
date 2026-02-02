@@ -69,5 +69,7 @@ app.post('/api/login', async (req, res) => {
 // --- ระบบแจ้งเตือนการซื้อ (สั่งซื้อจำลอง) ---
 app.post('/api/purchase', (req, res) => {
     res.json({ status: "success", message: "ซื้อสินค้าสำเร็จ! แจ้งเตือนไปยังระบบจัดการแล้ว" });
+    // เพิ่มบรรทัดนี้เพื่อให้ Server เข้าถึงหน้า login.html ในโฟลเดอร์ public ได้
+app.use(express.static('public'));
 });
 });
