@@ -3,10 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 
-// --- 1. Middleware (ส่วนการตั้งค่า) ---
+// --- 1. Middleware (ต้องวางไว้บนสุด) ---
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public')); // เปิดทางให้เข้าถึงโฟลเดอร์ public ได้ทันที
+app.use(express.static('public')); // แก้ปัญหา Cannot GET /login.html
 
 // --- 2. การเชื่อมต่อฐานข้อมูล ---
 const mongoURI = "mongodb+srv://admin:RockHeart_2548@cluster0.hnhzatk.mongodb.net/shopDB?retryWrites=true&w=majority";
@@ -14,7 +14,7 @@ mongoose.connect(mongoURI)
     .then(() => console.log("เชื่อมต่อฐานข้อมูล Cloud สำเร็จแล้ว!"))
     .catch(err => console.error("เชื่อมต่อไม่สำเร็จเพราะ: ", err));
 
-// --- 3. Models (โครงสร้างข้อมูล) ---
+// --- 3. Models ---
 const User = mongoose.model('User', {
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -29,9 +29,8 @@ const Product = mongoose.model('Product', {
     stock: { type: Number, default: 10 }
 });
 
-// --- 4. API Routes (ส่วนการทำงาน) ---
+// --- 4. API Routes (ย้ายออกมาอยู่นอก listen) ---
 
-// ดึงข้อมูลสินค้า
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find();
@@ -41,7 +40,6 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-// สมัครสมาชิก
 app.post('/api/register', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -53,7 +51,6 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// เข้าสู่ระบบ
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     const user = await User.findOne({ username, password });
@@ -64,9 +61,12 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// แจ้งเตือนการซื้อ
 app.post('/api/purchase', (req, res) => {
     res.json({ status: "success", message: "ซื้อสินค้าสำเร็จ! แจ้งเตือนไปยังระบบจัดการแล้ว" });
 });
 
-// --- 5. Start Server ---
+// --- 5. Start Server (ต้องอยู่ล่างสุดและไม่มีโค้ดซ้อนข้างใน) ---
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
