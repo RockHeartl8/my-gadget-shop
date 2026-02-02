@@ -2,81 +2,124 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Login - My Gadget Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - ROCKYSTORE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; background: #0f172a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: rgba(255, 255, 255, 0.05); padding: 2rem; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); width: 350px; text-align: center; }
-        h2 { color: #38bdf8; margin-bottom: 1.5rem; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: rgba(255, 255, 255, 0.1); color: white; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border-radius: 8px; border: none; background: #38bdf8; color: #0f172a; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        button:hover { background: #0ea5e9; transform: translateY(-2px); }
-        .toggle-link { margin-top: 15px; font-size: 0.9rem; color: #94a3b8; cursor: pointer; }
+        :root { 
+            --bg-light: #f0f9ff; 
+            --accent-blue: #0ea5e9; 
+            --deep-blue: #0369a1; 
+            --white: #ffffff;
+            --text-gray: #64748b;
+        }
+
+        body { 
+            font-family: 'Kanit', sans-serif; 
+            background: radial-gradient(circle at top left, #ffffff, var(--bg-light)); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+        }
+
+        /* กล่อง Login ปรับให้เข้ากับธีมใหม่ */
+        .login-card { 
+            background: var(--white); 
+            padding: 40px; 
+            border-radius: 24px; 
+            box-shadow: 0 20px 40px rgba(14, 165, 233, 0.1); 
+            width: 100%; 
+            max-width: 400px; 
+            text-align: center;
+            border: 1px solid #e0f2fe;
+        }
+
+        /* โลโก้ RockyStore ในหน้า Login */
+        .rock-logo {
+            width: 60px; height: 50px; background: var(--accent-blue); 
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
+            border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2);
+        }
+
+        .login-card h2 { color: var(--deep-blue); margin-bottom: 30px; font-weight: 800; font-size: 1.8rem; }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem; }
+        
+        .input-group input { 
+            width: 100%; padding: 12px 15px; border-radius: 12px; 
+            border: 1px solid #bae6fd; background: #f8fafc; color: #1e293b; 
+            font-family: 'Kanit'; outline: none; transition: 0.3s; box-sizing: border-box;
+        }
+
+        .input-group input:focus { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(14, 165, 233, 0.1); }
+
+        /* ปุ่มกดใช้ Gradient เหมือนหน้า Index */
+        .btn-login { 
+            background: linear-gradient(90deg, var(--deep-blue), var(--accent-blue)); 
+            color: white; border: none; padding: 14px; border-radius: 12px; 
+            width: 100%; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover { opacity: 0.9; transform: scale(1.02); }
+
+        .footer-links { margin-top: 25px; font-size: 0.9rem; color: var(--text-gray); }
+        .footer-links a { color: var(--accent-blue); text-decoration: none; font-weight: 600; }
     </style>
 </head>
 <body>
+
     <div class="login-card">
-        <h2 id="form-title">เข้าสู่ระบบ</h2>
-        <input type="text" id="username" placeholder="ชื่อผู้ใช้">
-        <input type="password" id="password" placeholder="รหัสผ่าน">
-        <button onclick="handleAuth()" id="btn-auth">เข้าสู่ระบบ</button>
-        <p class="toggle-link" onclick="toggleForm()" id="toggle-text">ยังไม่มีบัญชี? สมัครสมาชิก</p>
+        <div class="rock-logo"><i class="fa-solid fa-gem" style="color:white"></i></div>
+        <h2>เข้าสู่ระบบ</h2>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <label>ชื่อผู้ใช้งาน</label>
+                <input type="text" id="username" placeholder="กรอกชื่อผู้ใช้..." required>
+            </div>
+            <div class="input-group">
+                <label>รหัสผ่าน</label>
+                <input type="password" id="password" placeholder="กรอกรหัสผ่าน..." required>
+            </div>
+            <button type="submit" class="btn-login">เข้าสู่ระบบ</button>
+        </form>
+
+        <div class="footer-links">
+            ยังไม่มีบัญชี? <a href="/register.html">สมัครสมาชิกที่นี่</a>
+        </div>
     </div>
 
     <script>
-        let isLogin = true;
-        function toggleForm() {
-            isLogin = !isLogin;
-            document.getElementById('form-title').innerText = isLogin ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-            document.getElementById('btn-auth').innerText = isLogin ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
-            document.getElementById('toggle-text').innerText = isLogin ? 'ยังไม่มีบัญชี? สมัครสมาชิก' : 'มีบัญชีอยู่แล้ว? เข้าสู่ระบบ';
-        }
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const data = {
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            };
 
-  async function handleAuth() {
-    const user = { 
-        username: document.getElementById('username').value, 
-        password: document.getElementById('password').value 
-    };
-    const endpoint = isLogin ? '/api/login' : '/api/register';
-    
-    try {
-        const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(user)
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-            Swal.fire({
-                title: 'สำเร็จ!',
-                text: data.message,
-                icon: 'success',
-                timer: 1500,
-                showConfirmButton: false
-            }).then(() => {
-                if (isLogin) {
-                    // เก็บข้อมูล User ไว้ในเครื่อง
-                    localStorage.setItem('user', JSON.stringify(data));
-
-                    // --- ส่วนตัดสินใจแยกหน้า (Redirect Logic) ---
-                    if (data.role === 'admin') {
-                        window.location.href = '/admin.html'; // ส่งแอดมินไปหน้าจัดการของ
-                    } else {
-                        window.location.href = '/index.html'; // ส่งลูกค้าไปหน้าเลือกซื้อของ
-                    }
-                } else {
-                    toggleForm(); // สมัครเสร็จให้สลับมาหน้า Login
-                }
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
             });
-        } else {
-            Swal.fire('ผิดพลาด', data.message, 'error');
-        }
-    } catch (err) {
-        Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-    }
-}
+
+            const result = await res.json();
+            if (res.ok) {
+                // บันทึกข้อมูลลง LocalStorage เพื่อใช้เช็คสิทธิ์
+                localStorage.setItem('user', JSON.stringify(result));
+                Swal.fire('สำเร็จ!', 'กำลังพาคุณไปหน้าหลัก...', 'success')
+                    .then(() => window.location.href = '/index.html');
+            } else {
+                Swal.fire('ผิดพลาด', result.message, 'error');
+            }
+        };
     </script>
 </body>
 </html>
