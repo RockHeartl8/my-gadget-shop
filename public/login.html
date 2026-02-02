@@ -8,67 +8,17 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --bg-light: #f0f9ff; 
-            --accent-blue: #0ea5e9; 
-            --deep-blue: #0369a1; 
-            --white: #ffffff;
-            --text-gray: #64748b;
-        }
-
-        body { 
-            font-family: 'Kanit', sans-serif; 
-            background: radial-gradient(circle at top left, #ffffff, var(--bg-light)); 
-            margin: 0; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-        }
-
-        /* กล่อง Login ปรับให้เข้ากับธีมใหม่ */
-        .login-card { 
-            background: var(--white); 
-            padding: 40px; 
-            border-radius: 24px; 
-            box-shadow: 0 20px 40px rgba(14, 165, 233, 0.1); 
-            width: 100%; 
-            max-width: 400px; 
-            text-align: center;
-            border: 1px solid #e0f2fe;
-        }
-
-        /* โลโก้ RockyStore ในหน้า Login */
-        .rock-logo {
-            width: 60px; height: 50px; background: var(--accent-blue); 
-            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
-            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
-            border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2);
-        }
-
+        :root { --bg-light: #f0f9ff; --accent-blue: #0ea5e9; --deep-blue: #0369a1; --white: #ffffff; --text-gray: #64748b; }
+        body { font-family: 'Kanit', sans-serif; background: radial-gradient(circle at top left, #ffffff, var(--bg-light)); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-card { background: var(--white); padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(14, 165, 233, 0.1); width: 100%; max-width: 400px; text-align: center; border: 1px solid #e0f2fe; }
+        .rock-logo { width: 60px; height: 50px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2); }
         .login-card h2 { color: var(--deep-blue); margin-bottom: 30px; font-weight: 800; font-size: 1.8rem; }
-
         .input-group { margin-bottom: 20px; text-align: left; }
         .input-group label { display: block; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem; }
-        
-        .input-group input { 
-            width: 100%; padding: 12px 15px; border-radius: 12px; 
-            border: 1px solid #bae6fd; background: #f8fafc; color: #1e293b; 
-            font-family: 'Kanit'; outline: none; transition: 0.3s; box-sizing: border-box;
-        }
-
+        .input-group input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #bae6fd; background: #f8fafc; color: #1e293b; font-family: 'Kanit'; outline: none; transition: 0.3s; box-sizing: border-box; }
         .input-group input:focus { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(14, 165, 233, 0.1); }
-
-        /* ปุ่มกดใช้ Gradient เหมือนหน้า Index */
-        .btn-login { 
-            background: linear-gradient(90deg, var(--deep-blue), var(--accent-blue)); 
-            color: white; border: none; padding: 14px; border-radius: 12px; 
-            width: 100%; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem;
-            margin-top: 10px;
-        }
-
+        .btn-login { background: linear-gradient(90deg, var(--deep-blue), var(--accent-blue)); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; margin-top: 10px; }
         .btn-login:hover { opacity: 0.9; transform: scale(1.02); }
-
         .footer-links { margin-top: 25px; font-size: 0.9rem; color: var(--text-gray); }
         .footer-links a { color: var(--accent-blue); text-decoration: none; font-weight: 600; }
     </style>
@@ -78,7 +28,6 @@
     <div class="login-card">
         <div class="rock-logo"><i class="fa-solid fa-gem" style="color:white"></i></div>
         <h2>เข้าสู่ระบบ</h2>
-        
         <form id="loginForm">
             <div class="input-group">
                 <label>ชื่อผู้ใช้งาน</label>
@@ -90,7 +39,6 @@
             </div>
             <button type="submit" class="btn-login">เข้าสู่ระบบ</button>
         </form>
-
         <div class="footer-links">
             ยังไม่มีบัญชี? <a href="/register.html">สมัครสมาชิกที่นี่</a>
         </div>
@@ -104,20 +52,32 @@
                 password: document.getElementById('password').value
             };
 
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
 
-            const result = await res.json();
-            if (res.ok) {
-                // บันทึกข้อมูลลง LocalStorage เพื่อใช้เช็คสิทธิ์
-                localStorage.setItem('user', JSON.stringify(result));
-                Swal.fire('สำเร็จ!', 'กำลังพาคุณไปหน้าหลัก...', 'success')
-                    .then(() => window.location.href = '/index.html');
-            } else {
-                Swal.fire('ผิดพลาด', result.message, 'error');
+                const result = await res.json();
+                
+                if (res.ok) {
+                    // บันทึกข้อมูลลง LocalStorage
+                    localStorage.setItem('user', JSON.stringify(result));
+
+                    // --- จุดที่แก้ไข: ระบบแยกสิทธิ์ Admin และ User ---
+                    if (result.role === 'admin') {
+                        Swal.fire('ยินดีต้อนรับ Admin', 'กำลังพาคุณไปหน้าจัดการคลัง...', 'success')
+                            .then(() => window.location.href = '/admin.html');
+                    } else {
+                        Swal.fire('สำเร็จ!', 'กำลังพาคุณไปเลือกซื้อสินค้า...', 'success')
+                            .then(() => window.location.href = '/index.html');
+                    }
+                } else {
+                    Swal.fire('ผิดพลาด', result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+                }
+            } catch (err) {
+                Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
             }
         };
     </script>
