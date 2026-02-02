@@ -1,27 +1,31 @@
-<div id="admin-product-list" style="margin-top: 30px;">
-    <h3>รายการสินค้าในคลัง</h3>
-    <div id="list-container"></div>
+<div class="container">
+    <h2>จัดการคลังอุปกรณ์คอมพิวเตอร์</h2>
+    <input type="text" id="name" placeholder="ชื่ออุปกรณ์ (เช่น RTX 4060)">
+    <input type="number" id="price" placeholder="ราคา">
+    <input type="text" id="img" placeholder="ลิงก์รูปภาพ">
+    <button onclick="addProduct()">เพิ่มเข้าคลัง</button>
+    <hr>
+    <div id="product-list"></div>
 </div>
 
 <script>
-// ฟังก์ชันดึงของมาโชว์พร้อมปุ่มลบ
-async function loadAdminProducts() {
+async function addProduct() { // ระบบเติมของ
+    const data = { name: document.getElementById('name').value, price: document.getElementById('price').value, img: document.getElementById('img').value };
+    await fetch('/api/products', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+    location.reload();
+}
+
+async function loadProducts() { // ระบบลบของ
     const res = await fetch('/api/products');
     const products = await res.json();
-    const container = document.getElementById('list-container');
-    container.innerHTML = products.map(p => `
-        <div style="background: rgba(255,255,255,0.1); padding: 10px; margin: 5px; border-radius: 8px; display: flex; justify-content: space-between;">
-            <span>${p.name} - ${p.price} บาท</span>
-            <button onclick="deleteProduct('${p._id}')" style="width: auto; background: #ef4444; padding: 5px 10px;">ลบ</button>
-        </div>
+    document.getElementById('product-list').innerHTML = products.map(p => `
+        <div>${p.name} - ${p.price}฿ <button onclick="deleteProduct('${p._id}')">ลบ</button></div>
     `).join('');
 }
 
-async function deleteProduct(id) {
-    if(confirm('ยืนยันการลบสินค้า?')) {
-        await fetch(`/api/products/${id}`, { method: 'DELETE' });
-        loadAdminProducts(); // รีเฟรชรายการ
-    }
+async function deleteProduct(id) { // ฟังก์ชันลบ
+    await fetch(`/api/products/${id}`, { method: 'DELETE' });
+    loadProducts();
 }
-loadAdminProducts(); // รันตอนเปิดหน้า
+loadProducts();
 </script>
