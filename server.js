@@ -43,4 +43,31 @@ app.get('/api/products', async (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+
+    // --- ระบบสมัครสมาชิก และ Login ---
+app.post('/api/register', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const newUser = new User({ username, password }); // ในงานจริงควรแฮชรหัสผ่านด้วย bcrypt
+        await newUser.save();
+        res.status(201).json({ message: "สมัครสมาชิกสำเร็จ!" });
+    } catch (err) {
+        res.status(400).json({ message: "ชื่อผู้ใช้นี้ถูกใช้ไปแล้ว" });
+    }
+});
+
+app.post('/api/login', async (req, res) => {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username, password });
+    if (user) {
+        res.json({ message: "เข้าสู่ระบบสำเร็จ", role: user.role, username: user.username });
+    } else {
+        res.status(401).json({ message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
+    }
+});
+
+// --- ระบบแจ้งเตือนการซื้อ (สั่งซื้อจำลอง) ---
+app.post('/api/purchase', (req, res) => {
+    res.json({ status: "success", message: "ซื้อสินค้าสำเร็จ! แจ้งเตือนไปยังระบบจัดการแล้ว" });
+});
 });
