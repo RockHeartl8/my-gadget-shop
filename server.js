@@ -13,8 +13,19 @@ mongoose.connect(mongoURI)
     .then(() => console.log("เชื่อมต่อฐานข้อมูล Cloud สำเร็จแล้ว!"))
     .catch(err => console.error("เชื่อมต่อไม่สำเร็จเพราะ: ", err));
 
+// 1. Model สำหรับสมาชิก (วางทับของเดิมเพื่อเพิ่มระบบ User และสต็อก)
+const User = mongoose.model('User', {
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: String, default: 'user' }, // 'admin' หรือ 'user'
+    cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] 
+});
+
 const Product = mongoose.model('Product', {
-    name: String, price: Number, img: String
+    name: String,
+    price: Number,
+    img: String,
+    stock: { type: Number, default: 10 } // เพิ่มจำนวนของในคลัง
 });
 
 // ก๊อปปี้ส่วนนี้ไปทับ app.get ตัวเก่าใน server.js (ประมาณบรรทัดที่ 18-27)
