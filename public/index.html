@@ -11,13 +11,12 @@
         :root { --bg-light: #f0f9ff; --sidebar-grad: linear-gradient(180deg, #e0f2fe 0%, #ffffff 100%); --accent-blue: #0ea5e9; --deep-blue: #0369a1; --navy-dark: #0f172a; }
         body { font-family: 'Kanit', sans-serif; background: var(--bg-light); color: #1e293b; margin: 0; display: flex; min-height: 100vh; }
 
-        /* Sidebar - จัดระเบียบใหม่ */
+        /* Sidebar */
         .sidebar { width: 260px; background: var(--sidebar-grad); border-right: 1px solid #bae6fd; padding: 20px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; }
         .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; }
         .rock-icon { width: 65px; height: 55px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2); margin-bottom: 10px; }
         .sidebar h1 { color: var(--navy-dark); text-align: center; margin: 0; font-weight: 800; font-size: 1.8rem; letter-spacing: -1px; text-transform: uppercase; }
 
-        /* รายการหมวดหมู่ */
         .category-item { padding: 10px 15px; margin: 4px 0; cursor: pointer; border-radius: 12px; transition: 0.3s; color: #64748b; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; }
         .category-item:hover, .category-item.active { background: white; color: var(--accent-blue); font-weight: 600; box-shadow: 0 4px 12px rgba(14,165,233,0.1); }
 
@@ -28,19 +27,22 @@
         .search-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid #bae6fd; border-radius: 10px; padding: 5px 15px; width: 45%; }
         .search-box input { background: transparent; border: none; padding: 8px; width: 100%; outline: none; font-family: 'Kanit'; }
 
-        /* Carousel สินค้าแนะนำ */
+        /* Carousel */
         .hero-section { background: white; border-radius: 20px; padding: 25px; border: 1px solid #bae6fd; }
         .carousel-container { display: flex; overflow-x: auto; gap: 20px; padding: 10px 5px; scrollbar-width: thin; }
         .carousel-item { min-width: 320px; background: #f8fafc; border-radius: 18px; padding: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid #e0f2fe; flex-shrink: 0; }
         .carousel-item img { width: 100px; height: 100px; object-fit: contain; background: white; border-radius: 12px; padding: 5px; flex-shrink: 0; }
         .carousel-info { display: flex; flex-direction: column; gap: 5px; overflow: hidden; }
 
-        /* Grid สินค้า */
+        /* Grid สินค้า - เพิ่มความสวยงามให้ปุ่มคู่ */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 20px; padding: 20px; text-align: center; border: 1px solid #f0f9ff; box-shadow: 0 5px 15px rgba(0,0,0,0.02); transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(14, 165, 233, 0.1); }
         .card img { width: 100%; height: 150px; object-fit: contain; margin-bottom: 15px; background: #f8fafc; border-radius: 12px; padding: 8px; box-sizing: border-box; }
-        .btn-add { background: linear-gradient(90deg, var(--deep-blue), var(--accent-blue)); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; width: 100%; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-detail { flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn-detail:hover { background: #e2e8f0; }
+        .btn-add { flex: 1; background: linear-gradient(90deg, var(--deep-blue), var(--accent-blue)); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -50,7 +52,6 @@
             <div class="rock-icon"><i class="fa-solid fa-gem" style="color:white"></i></div>
             <h1>ROCKYSTORE</h1>
         </div>
-
         <div class="category-item active" onclick="filterCategory('all', this)"><i class="fa-solid fa-border-all"></i> สินค้าทั้งหมด</div>
         <div class="category-item" onclick="filterCategory('monitor', this)"><i class="fa-solid fa-display"></i> จอคอม</div>
         <div class="category-item" onclick="filterCategory('gpu', this)"><i class="fa-solid fa-microchip"></i> การ์ดจอ</div>
@@ -60,8 +61,8 @@
         <div class="category-item" onclick="filterCategory('ram', this)"><i class="fa-solid fa-hard-drive"></i> แรม</div>
         <div class="category-item" onclick="filterCategory('ssd', this)"><i class="fa-solid fa-database"></i> ฮาร์ดดิส / SSD</div>
         <div class="category-item" onclick="filterCategory('etc', this)"><i class="fa-solid fa-plug"></i> จิปาถะ</div>
-        
-        <div style="flex-grow: 1;"></div> </div>
+        <div style="flex-grow: 1;"></div>
+    </div>
 
     <div class="main-content">
         <div class="toolbar">
@@ -113,7 +114,10 @@
                         <div style="font-weight:700; font-size:0.75rem; color:var(--accent-blue)">HOT DEAL</div>
                         <div style="font-weight:600; font-size:0.85rem; color:var(--navy-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</div>
                         <div style="color:var(--deep-blue); font-weight:700;">${p.price.toLocaleString()} ฿</div>
-                        <button onclick="addToCart('${p._id}')" style="background:var(--accent-blue); color:white; border:none; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:0.75rem; width:fit-content;">+ ตะกร้า</button>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="viewDetail('${p._id}')" style="background:#fff; border:1px solid #ddd; border-radius:6px; padding:4px 8px; cursor:pointer; font-size:0.7rem;">รายละเอียด</button>
+                            <button onclick="addToCart('${p._id}')" style="background:var(--accent-blue); color:white; border:none; border-radius:6px; padding:4px 8px; cursor:pointer; font-size:0.7rem;">+ ตะกร้า</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -123,9 +127,23 @@
                     <img src="${p.img}" alt="${p.name}">
                     <div style="font-weight:600; font-size:0.95rem; margin-bottom:8px; height:2.4em; overflow:hidden;">${p.name}</div>
                     <div style="color:var(--deep-blue); font-weight:700; font-size:1.2rem; margin-bottom:12px;">${p.price.toLocaleString()} ฿</div>
-                    <button class="btn-add" onclick="addToCart('${p._id}')">เพิ่มลงตะกร้า</button>
+                    <div class="btn-group">
+                        <button class="btn-detail" onclick="viewDetail('${p._id}')">รายละเอียด</button>
+                        <button class="btn-add" onclick="addToCart('${p._id}')">เพิ่มลงตะกร้า</button>
+                    </div>
                 </div>
             `).join('');
+        }
+
+        function viewDetail(id) {
+            const item = allProducts.find(p => p._id === id);
+            Swal.fire({
+                title: item.name,
+                text: `หมวดหมู่: ${item.category} | ราคา: ${item.price.toLocaleString()} ฿`,
+                imageUrl: item.img,
+                imageWidth: 300,
+                confirmButtonText: 'ปิด'
+            });
         }
 
         function filterCategory(cat, el) {
@@ -142,18 +160,22 @@
             Swal.fire({ title: 'สำเร็จ!', text: `เพิ่ม ${item.name} แล้ว`, icon: 'success', timer: 1000, showConfirmButton: false, toast: true, position: 'top-end' });
         }
 
-        // ระบบตะกร้าใหม่: แสดงรายการและคำนวณเงิน
+        // ระบบตะกร้าอัปเกรด: เพิ่มปุ่มลบสินค้าแต่ละรายการ
         function showCartItems() {
             if (cart.length === 0) return Swal.fire('ตะกร้าว่างเปล่า', '', 'info');
             const total = cart.reduce((sum, item) => sum + item.price, 0);
+            
             Swal.fire({
                 title: '🛒 ตะกร้าสินค้าของคุณ',
                 html: `
-                    <div style="text-align:left; max-height:300px; overflow-y:auto; margin-bottom:15px;">
+                    <div id="swal-cart-list" style="text-align:left; max-height:300px; overflow-y:auto; margin-bottom:15px;">
                         ${cart.map((i, idx) => `
-                            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px;">
-                                <span style="font-size:0.85rem; padding-right:10px;">${idx+1}. ${i.name}</span>
-                                <b style="color:var(--deep-blue);">${i.price.toLocaleString()}฿</b>
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                                <span style="font-size:0.85rem; flex:1;">${idx+1}. ${i.name}</span>
+                                <b style="color:var(--deep-blue); margin: 0 10px;">${i.price.toLocaleString()}฿</b>
+                                <button onclick="removeFromCart(${idx})" style="background:#ffeded; color:#f43f5e; border:none; padding:5px 8px; border-radius:5px; cursor:pointer;">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
                             </div>
                         `).join('')}
                     </div>
@@ -169,10 +191,21 @@
                 if(r.isConfirmed) { 
                     cart=[]; 
                     document.getElementById('cart-count').innerText='0'; 
-                    Swal.fire('สั่งซื้อสำเร็จ!', 'RockyStore ได้รับคำสั่งซื้อของคุณแล้ว', 'success'); 
+                    Swal.fire('สั่งซื้อสำเร็จ!', 'RockyStore ได้รับคำั่งซื้อของคุณแล้ว', 'success'); 
                 } 
             });
         }
+
+        // ฟังก์ชันลบสินค้าออกจากตะกร้า
+        window.removeFromCart = function(index) {
+            cart.splice(index, 1);
+            document.getElementById('cart-count').innerText = cart.length;
+            if (cart.length === 0) {
+                Swal.close();
+            } else {
+                showCartItems(); // รีเฟรชหน้าต่างตะกร้าเพื่อให้เห็นการเปลี่ยนแปลงทันที
+            }
+        };
 
         function searchProducts() {
             const term = document.getElementById('search-input').value.replace(/\s+/g, '').toLowerCase();
@@ -183,7 +216,10 @@
                     <img src="${p.img}">
                     <div style="font-weight:600;">${p.name}</div>
                     <div style="color:var(--deep-blue); font-weight:700;">${p.price.toLocaleString()} ฿</div>
-                    <button class="btn-add" onclick="addToCart('${p._id}')">เพิ่มลงตะกร้า</button>
+                    <div class="btn-group">
+                        <button class="btn-detail" onclick="viewDetail('${p._id}')">รายละเอียด</button>
+                        <button class="btn-add" onclick="addToCart('${p._id}')">เพิ่มลงตะกร้า</button>
+                    </div>
                 </div>
             `).join('');
         }
