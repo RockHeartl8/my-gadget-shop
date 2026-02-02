@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 
-// --- 1. Middleware (ต้องวางไว้บนสุด) ---
+// --- 1. Middleware ---
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public')); // แก้ปัญหา Cannot GET /login.html
+app.use(express.static('public')); 
 
-// --- 2. การเชื่อมต่อฐานข้อมูล ---
+// --- 2. Database Connection ---
 const mongoURI = "mongodb+srv://admin:RockHeart_2548@cluster0.hnhzatk.mongodb.net/shopDB?retryWrites=true&w=majority";
 mongoose.connect(mongoURI)
     .then(() => console.log("เชื่อมต่อฐานข้อมูล Cloud สำเร็จแล้ว!"))
@@ -29,7 +29,7 @@ const Product = mongoose.model('Product', {
     stock: { type: Number, default: 10 }
 });
 
-// --- 4. API Routes (ย้ายออกมาอยู่นอก listen) ---
+// --- 4. API Routes ---
 
 app.get('/api/products', async (req, res) => {
     try {
@@ -65,7 +65,7 @@ app.post('/api/purchase', (req, res) => {
     res.json({ status: "success", message: "ซื้อสินค้าสำเร็จ! แจ้งเตือนไปยังระบบจัดการแล้ว" });
 });
 
-// --- 5. Start Server (ต้องอยู่ล่างสุดและไม่มีโค้ดซ้อนข้างใน) ---
+// --- 5. Start Server (ย้ายมาไว้ข้างนอกสุด) ---
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
