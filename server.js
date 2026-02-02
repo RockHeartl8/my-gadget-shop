@@ -3,44 +3,74 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const app = express();
 
+// --- 1. Middleware ---
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public')); // เปิดทางให้เข้าถึงหน้า HTML ในโฟลเดอร์ public
+app.use(express.static('public')); // สำหรับดึงหน้า login, admin และ index
 
-// ฐานข้อมูลอุปกรณ์คอมพิวเตอร์
+// --- 2. Database Connection ---
 const mongoURI = "mongodb+srv://admin:RockHeart_2548@cluster0.hnhzatk.mongodb.net/shopDB?retryWrites=true&w=majority";
-mongoose.connect(mongoURI).then(() => console.log("เชื่อมต่อ shopDB สำเร็จ!")).catch(err => console.log(err));
+mongoose.connect(mongoURI)
+    .then(() => console.log("เชื่อมต่อ shopDB สำเร็จ!"))
+    .catch(err => console.log("Error:", err));
 
-// โมเดลข้อมูล
+// --- 3. Models (เพิ่ม Category ตามโจทย์ใหม่) ---
 const User = mongoose.model('User', { 
     username: { type: String, required: true, unique: true }, 
     password: { type: String, required: true },
-    role: { type: String, default: 'user' } 
+    role: { type: String, default: 'user' },
+    cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] // รองรับระบบตะกร้าในอนาคต
 });
 
 const Product = mongoose.model('Product', { 
-    name: String, price: Number, img: String, stock: { type: Number, default: 10 } 
+    name: String, 
+    price: Number, 
+    img: String, 
+    category: String, // เพิ่มฟิลด์หมวดหมู่: monitor, case, mainboard, cpu, ram, ssd, etc
+    stock: { type: Number, default: 10 } 
 });
 
-// --- API สำหรับร้านค้าอุปกรณ์คอมพิวเตอร์ ---
+// --- 4. API Routes ---
 
-app.get('/api/products', async (req, res) => { // ดึงรายการอุปกรณ์ทั้งหมด
-    const products = await Product.find();
-    res.json(products);
+// ดึงรายการอุปกรณ์ทั้งหมด (หรือกรองตามหมวดหมู่ได้)
+app.get('/api/products', async (req, res) => {
+    try {
+        const { category } = req.query;
+        let products;
+        if (category && category !== 'all') {
+            products = await Product.find({ category: category }); // กรองตามประเภทที่กดจาก sidebar
+        } else {
+            products = await Product.find();
+        }
+        res.json(products);
+    } catch (err) {
+        res.status(500).json({ message: "ดึงข้อมูลไม่สำเร็จ" });
+    }
 });
 
-app.post('/api/products', async (req, res) => { // แอดมินเพิ่มอุปกรณ์ใหม่
-    const newProduct = new Product(req.body);
-    await newProduct.save();
-    res.status(201).json(newProduct);
+// แอดมินเพิ่มอุปกรณ์ใหม่ (ต้องส่ง category มาด้วย)
+app.post('/api/products', async (req, res) => {
+    try {
+        const newProduct = new Product(req.body);
+        await newProduct.save();
+        res.status(201).json(newProduct);
+    } catch (err) {
+        res.status(400).json({ message: "เพิ่มสินค้าไม่สำเร็จ" });
+    }
 });
 
-app.delete('/api/products/:id', async (req, res) => { // แอดมินลบอุปกรณ์ออกจากคลัง
-    await Product.findByIdAndDelete(req.params.id);
-    res.json({ message: "ลบสำเร็จ" });
+// แอดมินลบอุปกรณ์ออกจากคลัง
+app.delete('/api/products/:id', async (req, res) => {
+    try {
+        await Product.findByIdAndDelete(req.params.id);
+        res.json({ message: "ลบสำเร็จ" });
+    } catch (err) {
+        res.status(500).json({ message: "ลบไม่สำเร็จ" });
+    }
 });
 
-app.post('/api/register', async (req, res) => { // สมัครสมาชิก
+// ระบบสมาชิก (สมัคร/Login)
+app.post('/api/register', async (req, res) => {
     try {
         const newUser = new User(req.body);
         await newUser.save();
@@ -48,11 +78,17 @@ app.post('/api/register', async (req, res) => { // สมัครสมาช�
     } catch (err) { res.status(400).json({ message: "ชื่อซ้ำ" }); }
 });
 
-app.post('/api/login', async (req, res) => { // เข้าสู่ระบบ
+app.post('/api/login', async (req, res) => {
     const user = await User.findOne(req.body);
     if (user) res.json({ message: "สำเร็จ", role: user.role, username: user.username });
     else res.status(401).json({ message: "ข้อมูลผิด" });
 });
 
+// ระบบสั่งซื้อจำลอง
+app.post('/api/purchase', (req, res) => {
+    res.json({ status: "success", message: "สั่งซื้อสำเร็จ!" });
+});
+
+// --- 5. Start Server ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`รันที่พอร์ต ${PORT}`)); //
+app.listen(PORT, () => console.log(`รันที่พอร์ต ${PORT}`));
