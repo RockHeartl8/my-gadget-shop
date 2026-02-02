@@ -11,7 +11,6 @@
             --dark-navy: #0f172a;
             --navy-blue: #1e293b;
             --bright-blue: #38bdf8;
-            --soft-blue: #e0f2fe;
             --white: #ffffff;
         }
 
@@ -24,17 +23,17 @@
             min-height: 100vh;
         }
 
-        /* แถบเมนูด้านซ้าย (Sidebar) ตามร่าง */
+        /* Sidebar - ย้าย จิปาถะ ลง และเพิ่ม การ์ดจอ */
         .sidebar {
             width: 260px;
             background-color: var(--navy-blue);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             padding: 20px;
-            display: flex;
-            flex-direction: column;
             position: sticky;
             top: 0;
             height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar h2 {
@@ -42,8 +41,6 @@
             font-size: 1.5rem;
             margin-bottom: 30px;
             text-align: center;
-            border-bottom: 2px solid var(--bright-blue);
-            padding-bottom: 10px;
         }
 
         .category-item {
@@ -53,28 +50,21 @@
             border-radius: 8px;
             transition: 0.3s;
             color: #94a3b8;
-            font-weight: 400;
         }
 
-        .category-item:hover {
-            background-color: rgba(56, 189, 248, 0.1);
-            color: var(--bright-blue);
-        }
-
-        .category-item.active {
+        .category-item:hover, .category-item.active {
             background-color: var(--bright-blue);
             color: var(--dark-navy);
             font-weight: 600;
         }
 
-        /* ส่วนแสดงผลหลัก (Main Content) */
+        /* Main Content */
         .main-content {
             flex: 1;
             padding: 30px;
-            background: linear-gradient(135deg, var(--dark-navy) 0%, #1e1b4b 100%);
         }
 
-        /* แถบเครื่องมือด้านบน (Toolbar) */
+        /* Toolbar - เพิ่มช่องค้นหาตามร่าง */
         .toolbar {
             display: flex;
             justify-content: space-between;
@@ -83,26 +73,39 @@
             background: rgba(255, 255, 255, 0.05);
             padding: 15px 25px;
             border-radius: 15px;
-            backdrop-filter: blur(10px);
         }
 
-        .toolbar h1 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: var(--soft-blue);
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--navy-blue);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 5px 15px;
+            width: 40%;
         }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-box i { color: var(--bright-blue); margin-right: 10px; }
 
         select {
             background: var(--navy-blue);
-            color: var(--white);
+            color: white;
             border: 1px solid var(--bright-blue);
             padding: 8px 15px;
             border-radius: 8px;
             cursor: pointer;
-            outline: none;
         }
 
-        /* ตารางสินค้า (Product Grid) */
+        /* Product Grid */
         .product-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -115,42 +118,23 @@
             border-radius: 20px;
             padding: 20px;
             text-align: center;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(5px);
+            transition: 0.4s;
         }
 
-        .product-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--bright-blue);
-            box-shadow: 0 15px 30px rgba(56, 189, 248, 0.15);
-        }
+        .product-card:hover { transform: translateY(-10px); border-color: var(--bright-blue); }
 
         .product-card img {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: contain;
+            background: white;
             border-radius: 12px;
-            margin-bottom: 15px;
-            background: white; /* เพื่อให้รูปอุปกรณ์คอมดูเด่นขึ้น */
             padding: 10px;
-            box-sizing: border-box;
-        }
-
-        .product-card h3 {
-            font-size: 1.1rem;
-            margin: 10px 0;
-            color: var(--soft-blue);
-        }
-
-        .product-card .price {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--bright-blue);
-            margin: 10px 0 20px 0;
+            margin-bottom: 15px;
         }
 
         .btn-buy {
-            background: linear-gradient(90deg, #0ea5e9, var(--bright-blue));
+            background: var(--bright-blue);
             color: var(--dark-navy);
             border: none;
             padding: 12px;
@@ -158,12 +142,7 @@
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: 0.3s;
-        }
-
-        .btn-buy:hover {
-            filter: brightness(1.1);
-            box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -173,17 +152,22 @@
         <h2>RockyStore</h2>
         <div class="category-item active" onclick="filterCategory('all', this)">สินค้าทั้งหมด</div>
         <div class="category-item" onclick="filterCategory('monitor', this)">จอคอม</div>
-        <div class="category-item" onclick="filterCategory('case', this)">เคสคอม</div>
+        <div class="category-item" onclick="filterCategory('gpu', this)">การ์ดจอ</div> <div class="category-item" onclick="filterCategory('case', this)">เคสคอม</div>
         <div class="category-item" onclick="filterCategory('mainboard', this)">เมนบอร์ด</div>
         <div class="category-item" onclick="filterCategory('cpu', this)">ซีพียู</div>
         <div class="category-item" onclick="filterCategory('ram', this)">แรม</div>
         <div class="category-item" onclick="filterCategory('ssd', this)">ฮาร์ดดิส / SSD</div>
-        <div class="category-item" onclick="filterCategory('etc', this)">จิปาถะ</div>
-    </div>
+        <div style="flex-grow: 1;"></div> <div class="category-item" onclick="filterCategory('etc', this)">จิปาถะ</div> </div>
 
     <div class="main-content">
         <div class="toolbar">
-            <h1 id="view-title">สินค้าแนะนำ</h1>
+            <h1 id="view-title" style="font-size: 1.2rem;">สินค้าทั้งหมด</h1>
+            
+            <div class="search-box">
+                <span style="color:#38bdf8">🔍</span>
+                <input type="text" id="search-input" placeholder="ค้นหาสินค้า..." onkeyup="searchProducts()">
+            </div>
+
             <select id="sort-select" onchange="sortProducts()">
                 <option value="default">เรียงลำดับ</option>
                 <option value="low-to-high">ราคา: ถูกไปแพง</option>
@@ -191,88 +175,56 @@
             </select>
         </div>
 
-        <div class="product-grid" id="product-list">
-            </div>
+        <div class="product-grid" id="product-list"></div>
     </div>
 
     <script>
         let allProducts = [];
         let filteredProducts = [];
 
-        // ดึงข้อมูลจาก API
         async function fetchProducts() {
-            try {
-                const res = await fetch('/api/products');
-                allProducts = await res.json();
-                filteredProducts = [...allProducts];
-                renderProducts(filteredProducts);
-            } catch (err) {
-                console.error("Error fetching products:", err);
-            }
+            const res = await fetch('/api/products');
+            allProducts = await res.json();
+            filteredProducts = [...allProducts];
+            renderProducts(filteredProducts);
         }
 
-        // แสดงผลสินค้าลงหน้าเว็บ
         function renderProducts(products) {
             const list = document.getElementById('product-list');
-            if (products.length === 0) {
-                list.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #94a3b8;">ไม่พบสินค้าในหมวดหมู่ นี้</p>`;
-                return;
-            }
             list.innerHTML = products.map(p => `
                 <div class="product-card">
-                    <img src="${p.img}" alt="${p.name}">
+                    <img src="${p.img}">
                     <h3>${p.name}</h3>
-                    <div class="price">${p.price.toLocaleString()} บาท</div>
-                    <button class="btn-buy" onclick="handlePurchase()">สั่งซื้อเลย</button>
+                    <div style="color:#38bdf8; font-weight:600">${p.price.toLocaleString()} บาท</div>
+                    <button class="btn-buy" onclick="buy()">สั่งซื้อเลย</button>
                 </div>
             `).join('');
         }
 
-        // ระบบกรองหมวดหมู่
-        function filterCategory(cat, element) {
-            // เปลี่ยนสถานะปุ่มที่เลือก
-            document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
-            element.classList.add('active');
-            
-            document.getElementById('view-title').innerText = element.innerText;
-
-            if (cat === 'all') {
-                filteredProducts = [...allProducts];
-            } else {
-                filteredProducts = allProducts.filter(p => p.category === cat);
-            }
-            sortProducts(); // เรียงลำดับซ้ำหลังจากกรอง
+        // ระบบค้นหาข้อมูล
+        function searchProducts() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            const result = filteredProducts.filter(p => p.name.toLowerCase().includes(term));
+            renderProducts(result);
         }
 
-        // ระบบเรียงลำดับราคา
-        function sortProducts() {
-            const sortVal = document.getElementById('sort-select').value;
-            if (sortVal === 'low-to-high') {
-                filteredProducts.sort((a, b) => a.price - b.price);
-            } else if (sortVal === 'high-to-low') {
-                filteredProducts.sort((a, b) => b.price - a.price);
-            }
+        function filterCategory(cat, el) {
+            document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('view-title').innerText = el.innerText;
+            
+            filteredProducts = cat === 'all' ? [...allProducts] : allProducts.filter(p => p.category === cat);
             renderProducts(filteredProducts);
         }
 
-        // ระบบสั่งซื้อจำลอง
-        function handlePurchase() {
-            Swal.fire({
-                title: 'ยืนยันการสั่งซื้อ?',
-                text: "ระบบจะทำการบันทึกรายการสั่งซื้ออุปกรณ์คอมพิวเตอร์ของคุณ",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#38bdf8',
-                cancelButtonColor: '#ef4444',
-                confirmButtonText: 'ยืนยันการซื้อ',
-                cancelButtonText: 'ยกเลิก'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire('สำเร็จ!', 'เราได้รับคำสั่งซื้อของคุณแล้ว', 'success');
-                }
-            });
+        function sortProducts() {
+            const val = document.getElementById('sort-select').value;
+            if (val === 'low-to-high') filteredProducts.sort((a,b) => a.price - b.price);
+            if (val === 'high-to-low') filteredProducts.sort((a,b) => b.price - a.price);
+            renderProducts(filteredProducts);
         }
 
+        function buy() { Swal.fire('สำเร็จ!', 'เพิ่มลงตะกร้าแล้ว', 'success'); }
         fetchProducts();
     </script>
 </body>
