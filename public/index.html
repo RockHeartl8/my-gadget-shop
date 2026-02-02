@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>My Modern Shop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50">
+    <nav class="bg-white p-4 shadow-sm text-center">
+        <h1 class="text-2xl font-bold text-slate-800">MY GADGET STORE</h1>
+    </nav>
+
+    <div class="max-w-6xl mx-auto p-8">
+        <div id="product-list" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            </div>
+    </div>
+
+    <script>
+        async function fetchProducts() {
+            const res = await fetch('/api/products');
+            const data = await res.json();
+            const list = document.getElementById('product-list');
+            
+            if(data.length === 0) {
+                list.innerHTML = "<p class='col-span-3 text-center text-gray-500'>ยังไม่มีสินค้าในร้าน... กำลังรอเจ้าของร้านเพิ่มข้อมูลครับ</p>";
+                return;
+            }
+
+            list.innerHTML = data.map(p => `
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition-transform">
+                    <img src="${p.img}" class="w-full h-56 object-cover">
+                    <div class="p-5">
+                        <h2 class="text-xl font-semibold">${p.name}</h2>
+                        <p class="text-blue-500 font-bold text-lg mt-2">${p.price.toLocaleString()} บาท</p>
+                        <button class="mt-4 w-full bg-slate-900 text-white py-2 rounded-lg hover:bg-slate-700">เพิ่มลงตะกร้า</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        fetchProducts();
+    </script>
+</body>
+</html>
