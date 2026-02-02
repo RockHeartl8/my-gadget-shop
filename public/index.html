@@ -1,64 +1,221 @@
-<div class="nav-icons">
-    <div id="user-section" style="display: flex; gap: 20px; align-items: center;">
-        <div class="cart-icon" id="cart-btn" onclick="showCartItems()">
-            🛒<span id="cart-count">0</span>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROCKYSTORE - Professional IT Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-light: #f0f9ff; --sidebar-grad: linear-gradient(180deg, #e0f2fe 0%, #ffffff 100%); --accent-blue: #0ea5e9; --deep-blue: #0369a1; --navy-dark: #0f172a; }
+        body { font-family: 'Kanit', sans-serif; background: var(--bg-light); color: #1e293b; margin: 0; display: flex; min-height: 100vh; }
+
+        /* Sidebar - คืนค่ารูปแบบเดิมเป๊ะๆ */
+        .sidebar { width: 260px; background: var(--sidebar-grad); border-right: 1px solid #bae6fd; padding: 20px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; }
+        .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; }
+        .rock-icon { width: 65px; height: 55px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2); margin-bottom: 10px; }
+        .sidebar h1 { color: var(--navy-dark); text-align: center; margin: 0; font-weight: 800; font-size: 1.8rem; letter-spacing: -1px; text-transform: uppercase; }
+
+        .category-item { padding: 10px 15px; margin: 4px 0; cursor: pointer; border-radius: 12px; transition: 0.3s; color: #64748b; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; }
+        .category-item:hover, .category-item.active { background: white; color: var(--accent-blue); font-weight: 600; box-shadow: 0 4px 12px rgba(14,165,233,0.1); }
+
+        .main-content { flex: 1; padding: 25px; display: flex; flex-direction: column; gap: 25px; overflow-x: hidden; }
+        
+        /* Toolbar & Auth Section */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 12px 25px; border-radius: 18px; border: 1px solid #e0f2fe; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
+        .search-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid #bae6fd; border-radius: 10px; padding: 5px 15px; width: 45%; }
+        .search-box input { background: transparent; border: none; padding: 8px; width: 100%; outline: none; font-family: 'Kanit'; }
+
+        .auth-btn { background: #e0f2fe; color: var(--deep-blue); text-decoration: none; padding: 8px 18px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .logout-link { color: #f43f5e; font-size: 0.8rem; cursor: pointer; text-decoration: underline; margin-left: 10px; }
+
+        /* Carousel & Grid */
+        .hero-section { background: white; border-radius: 20px; padding: 25px; border: 1px solid #bae6fd; }
+        .carousel-container { display: flex; overflow-x: auto; gap: 20px; padding: 10px 5px; scrollbar-width: thin; }
+        .carousel-item { min-width: 320px; background: #f8fafc; border-radius: 18px; padding: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid #e0f2fe; flex-shrink: 0; }
+        .carousel-item img { width: 100px; height: 100px; object-fit: contain; background: white; border-radius: 12px; padding: 5px; flex-shrink: 0; }
+
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 20px; padding: 20px; text-align: center; border: 1px solid #f0f9ff; box-shadow: 0 5px 15px rgba(0,0,0,0.02); transition: 0.3s; }
+        .card img { width: 100%; height: 150px; object-fit: contain; margin-bottom: 15px; background: #f8fafc; border-radius: 12px; padding: 8px; box-sizing: border-box; }
+        .btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-detail { flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        .btn-add { flex: 1; background: linear-gradient(90deg, var(--deep-blue), var(--accent-blue)); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="rock-icon"><i class="fa-solid fa-gem" style="color:white"></i></div>
+            <h1>ROCKYSTORE</h1>
         </div>
-        <div id="auth-area">
-            <a href="/login.html" class="login-btn">👤 เข้าสู่ระบบ</a>
+        <div class="category-item active" onclick="filterCategory('all', this)"><i class="fa-solid fa-border-all"></i> สินค้าทั้งหมด</div>
+        <div class="category-item" onclick="filterCategory('monitor', this)"><i class="fa-solid fa-display"></i> จอคอม</div>
+        <div class="category-item" onclick="filterCategory('gpu', this)"><i class="fa-solid fa-microchip"></i> การ์ดจอ</div>
+        <div class="category-item" onclick="filterCategory('case', this)"><i class="fa-solid fa-box-open"></i> เคสคอม</div>
+        <div class="category-item" onclick="filterCategory('mainboard', this)"><i class="fa-solid fa-memory"></i> เมนบอร์ด</div>
+        <div class="category-item" onclick="filterCategory('cpu', this)"><i class="fa-solid fa-server"></i> ซีพียู</div>
+        <div class="category-item" onclick="filterCategory('ram', this)"><i class="fa-solid fa-hard-drive"></i> แรม</div>
+        <div class="category-item" onclick="filterCategory('ssd', this)"><i class="fa-solid fa-database"></i> ฮาร์ดดิส / SSD</div>
+        <div class="category-item" onclick="filterCategory('etc', this)"><i class="fa-solid fa-plug"></i> จิปาถะ</div>
+        <div style="flex-grow: 1;"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="toolbar">
+            <h3 id="current-category" style="margin:0; color:var(--deep-blue)">หน้าร้านหลัก</h3>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" style="color:var(--accent-blue)"></i>
+                <input type="text" id="search-input" placeholder="ค้นหาอุปกรณ์..." onkeyup="searchProducts()">
+            </div>
+            <div style="display:flex; gap:20px; align-items:center;">
+                <div id="cart-section" style="cursor:pointer; position:relative; font-size:1.3rem;" onclick="showCartItems()">
+                    <i class="fa-solid fa-cart-shopping" style="color:var(--deep-blue)"></i>
+                    <span id="cart-count" style="position:absolute; top:-5px; right:-10px; background:#f43f5e; color:white; font-size:0.7rem; padding:2px 6px; border-radius:50%; font-weight:700;">0</span>
+                </div>
+                <div id="auth-display">
+                    <a href="/login.html" class="auth-btn">👤 เข้าสู่ระบบ</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-section">
+            <h2 id="hero-title" style="margin:0 0 15px 0; font-size:1.3rem; color:var(--navy-dark);"><i class="fa-solid fa-fire" style="color:#ef4444"></i> สินค้าที่แนะนำ</h2>
+            <div class="carousel-container" id="hero-carousel"></div>
+        </div>
+
+        <div>
+            <h2 id="grid-title" style="margin:0 0 15px 0; font-size:1.3rem;"><i class="fa-solid fa-boxes-stacked"></i> อุปกรณ์คอมพิวเตอร์</h2>
+            <div class="product-grid" id="product-list"></div>
         </div>
     </div>
-</div>
 
-<script>
-    // ส่วนที่ 2: ระบบตรวจสอบสถานะล็อกอินและการจดจำ User/Admin
-    function checkLoginStatus() {
-        const userData = JSON.parse(localStorage.getItem('user'));
-        const authArea = document.getElementById('auth-area');
-        const cartBtn = document.getElementById('cart-btn');
+    <script>
+        let allProducts = [], cart = [];
 
-        if (userData) {
-            // เปลี่ยนไอคอนและชื่อตามโจทย์: เปลี่ยนเป็นไอคอนคนเฉยๆ และจดจำชื่อ
-            authArea.innerHTML = `
-                <div style="display:flex; align-items:center; gap:10px; background:rgba(14,165,233,0.1); padding:8px 15px; border-radius:12px;">
-                    <span style="color:var(--deep-blue); font-weight:600;">👤 ${userData.username}</span>
-                    <button onclick="handleLogout()" style="background:var(--danger-red); color:white; border:none; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:0.8rem;">Logout</button>
+        // ระบบจดจำ User และ Admin พร้อมไอคอนโปรไฟล์
+        function checkAuth() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            const authDisplay = document.getElementById('auth-display');
+            const cartSection = document.getElementById('cart-section');
+
+            if (user) {
+                // เปลี่ยนไอคอนเป็นรูปคนและแสดงชื่อผู้ใช้ตามโจทย์
+                authDisplay.innerHTML = `
+                    <div style="display:flex; align-items:center;">
+                        <div class="auth-btn">
+                            👤 ${user.username}
+                        </div>
+                        <span class="logout-link" onclick="logout()">Logout</span>
+                    </div>
+                `;
+
+                // แยกสิทธิ์อย่างชัดเจน ห้ามผสมกัน
+                if (user.role === 'admin') {
+                    cartSection.style.display = 'none'; // Admin ห้ามใช้ตะกร้า
+                    authDisplay.innerHTML += `<a href="/admin.html" style="margin-left:10px; color:var(--accent-blue); font-size:0.8rem;">⚙️ จัดการ</a>`;
+                }
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.reload();
+        }
+
+        async function fetchProducts() {
+            try {
+                const res = await fetch('/api/products');
+                allProducts = await res.json();
+                updateUI('all');
+            } catch (err) { console.error(err); }
+        }
+
+        function updateUI(category) {
+            const list = document.getElementById('product-list');
+            const hero = document.getElementById('hero-carousel');
+            const filtered = (category === 'all') ? allProducts : allProducts.filter(p => p.category === category);
+            
+            hero.innerHTML = filtered.slice(0, 5).map(p => `
+                <div class="carousel-item">
+                    <img src="${p.img}" alt="${p.name}">
+                    <div class="carousel-info">
+                        <div style="font-weight:700; font-size:0.75rem; color:var(--accent-blue)">HOT DEAL</div>
+                        <div style="font-weight:600; font-size:0.85rem; color:var(--navy-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</div>
+                        <div style="color:var(--deep-blue); font-weight:700;">${p.price.toLocaleString()} ฿</div>
+                        <div style="display:flex; gap:5px;">
+                            <button onclick="viewDetail('${p._id}')" style="background:#fff; border:1px solid #ddd; border-radius:6px; padding:4px 8px; cursor:pointer; font-size:0.7rem;">รายละเอียด</button>
+                            <button onclick="addToCart('${p._id}')" style="background:var(--accent-blue); color:white; border:none; border-radius:6px; padding:4px 8px; cursor:pointer; font-size:0.7rem;">+ ตะกร้า</button>
+                        </div>
+                    </div>
                 </div>
-            `;
+            `).join('');
 
-            // แยกสิทธิ์อย่างชัดเจน ห้ามผสมกัน
-            if (userData.role === 'admin') {
-                cartBtn.style.display = 'none'; // Admin ไม่ต้องมีตะกร้า
-                // เพิ่มปุ่มไปหน้า Admin สำหรับผู้ที่มีสิทธิ์เท่านั้น
-                authArea.innerHTML += `<a href="/admin.html" style="margin-left:10px; color:var(--accent-blue); font-size:0.8rem;">⚙️ จัดการคลัง</a>`;
-            }
+            list.innerHTML = filtered.map(p => `
+                <div class="card">
+                    <img src="${p.img}" alt="${p.name}">
+                    <div style="font-weight:600; font-size:0.95rem; margin-bottom:8px; height:2.4em; overflow:hidden;">${p.name}</div>
+                    <div style="color:var(--deep-blue); font-weight:700; font-size:1.2rem; margin-bottom:12px;">${p.price.toLocaleString()} ฿</div>
+                    <div class="btn-group">
+                        <button class="btn-detail" onclick="viewDetail('${p._id}')">รายละเอียด</button>
+                        <button class="btn-add" onclick="addToCart('${p._id}')">เพิ่มลงตะกร้า</button>
+                    </div>
+                </div>
+            `).join('');
         }
-    }
 
-    // ระบบออกจากระบบและล้างการจดจำ
-    function handleLogout() {
-        Swal.fire({
-            title: 'ยืนยันการออกจากระบบ?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'ตกลง',
-            cancelButtonText: 'ยกเลิก'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                localStorage.removeItem('user'); // ล้างข้อมูล User/Admin
-                window.location.reload(); // รีเฟรชหน้าเพื่อคืนค่าไอคอน Login เดิม
-            }
-        });
-    }
-
-    // ป้องกัน User แอบเข้าหน้า Admin (ใส่โค้ดนี้ไว้ในไฟล์ admin.html ด้วย)
-    function restrictAdminAccess() {
-        const userData = JSON.parse(localStorage.getItem('user'));
-        if (!userData || userData.role !== 'admin') {
-            alert("สิทธิ์ของคุณไม่เพียงพอสำหรับการเข้าถึงหน้านี้");
-            window.location.href = '/index.html';
+        // ระบบตะกร้าและรายละเอียดสินค้าอื่นๆ เหมือนเดิม...
+        function addToCart(id) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) return Swal.fire('กรุณาล็อกอิน', '', 'warning');
+            const item = allProducts.find(p => p._id === id);
+            cart.push(item);
+            document.getElementById('cart-count').innerText = cart.length;
+            Swal.fire({ title: 'สำเร็จ!', text: `เพิ่ม ${item.name} แล้ว`, icon: 'success', timer: 1000, showConfirmButton: false, toast: true, position: 'top-end' });
         }
-    }
 
-    // รันฟังก์ชันตรวจสอบเมื่อโหลดหน้าเว็บ
-    window.onload = checkLoginStatus;
-</script>
+        function viewDetail(id) {
+            const item = allProducts.find(p => p._id === id);
+            Swal.fire({ title: item.name, text: `ราคา: ${item.price.toLocaleString()} ฿`, imageUrl: item.img, imageWidth: 300 });
+        }
+
+        function showCartItems() {
+            if (cart.length === 0) return Swal.fire('ตะกร้าว่างเปล่า', '', 'info');
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            Swal.fire({
+                title: '🛒 ตะกร้าสินค้า',
+                html: cart.map((i, idx) => `<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${i.name}</span><b>${i.price.toLocaleString()}฿</b><button onclick="removeFromCart(${idx})" style="color:red; border:none; background:none; cursor:pointer;"><i class="fa-solid fa-trash"></i></button></div>`).join('') + `<hr><b>รวม: ${total.toLocaleString()} ฿</b>`,
+                showCancelButton: true, confirmButtonText: 'ชำระเงิน'
+            });
+        }
+
+        window.removeFromCart = function(index) {
+            cart.splice(index, 1);
+            document.getElementById('cart-count').innerText = cart.length;
+            Swal.close();
+            showCartItems();
+        };
+
+        function filterCategory(cat, el) {
+            document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('current-category').innerText = el.innerText;
+            updateUI(cat);
+        }
+
+        function searchProducts() {
+            const term = document.getElementById('search-input').value.replace(/\s+/g, '').toLowerCase();
+            const result = allProducts.filter(p => p.name.replace(/\s+/g, '').toLowerCase().includes(term));
+            updateUI('all');
+            document.getElementById('product-list').innerHTML = result.map(p => `<div class="card"><img src="${p.img}"><div style="font-weight:600;">${p.name}</div><div style="color:var(--deep-blue); font-weight:700;">${p.price.toLocaleString()} ฿</div><div class="btn-group"><button class="btn-detail" onclick="viewDetail('${p._id}')">รายละเอียด</button><button class="btn-add" onclick="addToCart('${p._id}')">เพิ่มลงตะกร้า</button></div></div>`).join('');
+        }
+
+        window.onload = () => {
+            checkAuth();
+            fetchProducts();
+        };
+    </script>
+</body>
+</html>
