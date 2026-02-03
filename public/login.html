@@ -6,30 +6,45 @@
     <title>เข้าสู่ระบบ - ROCKYSTORE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-light: #f0f9ff; --accent-blue: #0ea5e9; --deep-blue: #0369a1; --white: #ffffff; --text-gray: #64748b; }
-        body { font-family: 'Kanit', sans-serif; background: radial-gradient(circle at top left, #ffffff, var(--bg-light)); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        :root { --bg-light: #f0f9ff; --accent-blue: #0ea5e9; --deep-blue: #0369a1; --white: #ffffff; --text-gray: #64748b; --success-green: #10b981; --danger-red: #f43f5e; }
         
-        .login-card { background: var(--white); padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(14, 165, 233, 0.1); width: 100%; max-width: 400px; text-align: center; border: 1px solid #e0f2fe; }
-        .rock-logo { width: 60px; height: 50px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2); }
+        body { font-family: 'Kanit', sans-serif; background: radial-gradient(circle at top left, #ffffff, var(--bg-light)); margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box; }
         
-        h2 { color: var(--deep-blue); margin-bottom: 25px; font-weight: 800; font-size: 1.8rem; }
+        /* Responsive Card */
+        .login-card { background: var(--white); padding: 45px 35px; border-radius: 28px; box-shadow: 0 25px 50px rgba(14, 165, 233, 0.1); width: 100%; max-width: 420px; text-align: center; border: 1px solid #e0f2fe; transition: 0.3s; }
         
+        .rock-logo { width: 65px; height: 55px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 8px 20px rgba(14, 165, 233, 0.2); }
+        
+        h2 { color: var(--navy-dark); margin-bottom: 25px; font-weight: 700; font-size: 1.8rem; letter-spacing: -0.5px; }
+        
+        /* Form Sections */
         .form-section { display: none; }
-        .form-section.active { display: block; animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .form-section.active { display: block; animation: slideUp 0.45s cubic-bezier(0.23, 1, 0.32, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(25px); } to { opacity: 1; transform: translateY(0); } }
 
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem; }
-        .input-group input { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #bae6fd; background: #f8fafc; color: #1e293b; font-family: 'Kanit'; outline: none; transition: 0.3s; box-sizing: border-box; }
-        .input-group input:focus { border-color: var(--accent-blue); box-shadow: 0 0 10px rgba(14, 165, 233, 0.1); }
+        .input-group { margin-bottom: 18px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem; font-weight: 500; }
+        .input-group input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1px solid #bae6fd; background: #f8fafc; color: #1e293b; font-family: 'Kanit'; outline: none; transition: 0.3s; box-sizing: border-box; font-size: 1rem; }
+        .input-group input:focus { border-color: var(--accent-blue); background: #ffffff; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.08); }
         
-        .btn-action { background: linear-gradient(90deg, var(--deep-blue), var(--accent-blue)); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; margin-top: 10px; }
-        .btn-action:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-action { color: white; border: none; padding: 15px; border-radius: 14px; width: 100%; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 1.05rem; margin-top: 10px; font-family: 'Kanit'; }
+        .btn-login { background: linear-gradient(135deg, var(--deep-blue), var(--accent-blue)); }
+        .btn-register { background: linear-gradient(135deg, #10b981, #34d399); }
+        .btn-reset { background: linear-gradient(135deg, var(--danger-red), #fb7185); }
+        .btn-action:hover { opacity: 0.92; transform: translateY(-2px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
         
-        .footer-links { margin-top: 20px; font-size: 0.85rem; color: var(--text-gray); }
-        .footer-links a { color: var(--accent-blue); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .footer-links { margin-top: 25px; font-size: 0.9rem; color: var(--text-gray); font-weight: 400; }
+        .footer-links a { color: var(--accent-blue); text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .footer-links a:hover { text-decoration: underline; color: var(--deep-blue); }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 480px) {
+            .login-card { padding: 35px 25px; border-radius: 24px; }
+            h2 { font-size: 1.5rem; }
+            .btn-action { padding: 13px; font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -38,26 +53,26 @@
         <div class="rock-logo"><i class="fa-solid fa-gem" style="color:white"></i></div>
 
         <div id="login-section" class="form-section active">
-            <h2>เข้าสู่ระบบ</h2>
+            <h2>ยินดีต้อนรับกลับ</h2>
             <form onsubmit="handleLogin(event)">
                 <div class="input-group">
                     <label>ชื่อผู้ใช้งาน</label>
-                    <input type="text" id="login-user" placeholder="กรอกชื่อผู้ใช้..." required>
+                    <input type="text" id="login-user" placeholder="ระบุชื่อผู้ใช้ของคุณ..." required>
                 </div>
                 <div class="input-group">
                     <label>รหัสผ่าน</label>
-                    <input type="password" id="login-pass" placeholder="กรอกรหัสผ่าน..." required>
+                    <input type="password" id="login-pass" placeholder="ระบุรหัสผ่าน..." required>
                 </div>
-                <button type="submit" class="btn-action">เข้าสู่ระบบ</button>
+                <button type="submit" class="btn-action btn-login">เข้าสู่ระบบ</button>
             </form>
             <div class="footer-links">
-                ยังไม่มีบัญชี? <a onclick="toggleForm('reg-section')">สมัครสมาชิกที่นี่</a><br>
-                <a onclick="toggleForm('reset-section')" style="color:#94a3b8; font-weight: 400; margin-top: 10px; display: inline-block;">ลืมรหัสผ่าน?</a>
+                ยังไม่มีบัญชีใช่หรือไม่? <a onclick="toggleForm('reg-section')">สมัครสมาชิกใหม่</a><br>
+                <a onclick="toggleForm('reset-section')" style="color:#94a3b8; font-weight: 400; margin-top: 15px; display: inline-block; font-size: 0.8rem;">ลืมรหัสผ่าน? คลิกที่นี่</a>
             </div>
         </div>
 
         <div id="reg-section" class="form-section">
-            <h2>สมัครสมาชิก</h2>
+            <h2>สร้างบัญชีใหม่</h2>
             <form onsubmit="handleRegister(event)">
                 <div class="input-group">
                     <label>ชื่อผู้ใช้งานที่ต้องการ</label>
@@ -65,30 +80,30 @@
                 </div>
                 <div class="input-group">
                     <label>รหัสผ่าน</label>
-                    <input type="password" id="reg-pass" placeholder="ตั้งรหัสผ่าน..." required>
+                    <input type="password" id="reg-pass" placeholder="ตั้งรหัสผ่านที่ปลอดภัย..." required>
                 </div>
-                <button type="submit" class="btn-action" style="background: linear-gradient(90deg, #10b981, #34d399);">สมัครสมาชิก</button>
+                <button type="submit" class="btn-action btn-register">ยืนยันสมัครสมาชิก</button>
             </form>
             <div class="footer-links">
-                มีบัญชีอยู่แล้ว? <a onclick="toggleForm('login-section')">กลับไปเข้าสู่ระบบ</a>
+                มีบัญชีอยู่แล้ว? <a onclick="toggleForm('login-section')">กลับไปหน้าล็อกอิน</a>
             </div>
         </div>
 
         <div id="reset-section" class="form-section">
-            <h2>รีเซ็ทรหัสผ่าน</h2>
+            <h2>ตั้งค่ารหัสผ่านใหม่</h2>
             <form onsubmit="handleReset(event)">
                 <div class="input-group">
-                    <label>ระบุชื่อผู้ใช้งาน</label>
-                    <input type="text" id="reset-user" placeholder="ชื่อผู้ใช้ที่ต้องการเปลี่ยนรหัส..." required>
+                    <label>ระบุชื่อผู้ใช้งานเดิม</label>
+                    <input type="text" id="reset-user" placeholder="กรอกชื่อผู้ใช้ที่ต้องการเปลี่ยนรหัส..." required>
                 </div>
                 <div class="input-group">
                     <label>รหัสผ่านใหม่</label>
-                    <input type="password" id="reset-pass" placeholder="ตั้งรหัสผ่านใหม่..." required>
+                    <input type="password" id="reset-pass" placeholder="ตั้งรหัสผ่านใหม่ของคุณ..." required>
                 </div>
-                <button type="submit" class="btn-action" style="background: linear-gradient(90deg, #f43f5e, #fb7185);">เปลี่ยนรหัสผ่าน</button>
+                <button type="submit" class="btn-action btn-reset">บันทึกรหัสผ่านใหม่</button>
             </form>
             <div class="footer-links">
-                นึกรหัสออกแล้ว? <a onclick="toggleForm('login-section')">กลับไปเข้าสู่ระบบ</a>
+                นึกรหัสเดิมออกแล้ว? <a onclick="toggleForm('login-section')">กลับไปหน้าล็อกอิน</a>
             </div>
         </div>
     </div>
@@ -98,7 +113,6 @@
         function toggleForm(id) {
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            // ล้างข้อมูลในช่องกรอกทุกครั้งที่สลับหน้า
             document.querySelectorAll('input').forEach(input => input.value = '');
         }
 
@@ -111,22 +125,20 @@
             };
             
             try {
-                const res = await fetch('/api/login', { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(data) 
-                });
+                const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
                 const result = await res.json();
                 
                 if (res.ok) {
                     localStorage.setItem('user', JSON.stringify(result));
                     if (result.role === 'admin') {
-                        Swal.fire('ยินดีต้อนรับ Admin', 'กำลังเข้าสู่ระบบจัดการ...', 'success').then(() => window.location.href = '/admin.html');
+                        Swal.fire({ icon: 'success', title: 'ยินดีต้อนรับแอดมิน', text: 'กำลังเข้าสู่แผงควบคุม...', timer: 1500, showConfirmButton: false })
+                            .then(() => window.location.href = '/admin.html');
                     } else {
-                        Swal.fire('สำเร็จ!', 'ยินดีต้อนรับคุณ ' + result.username, 'success').then(() => window.location.href = '/index.html');
+                        Swal.fire({ icon: 'success', title: 'เข้าสู่ระบบสำเร็จ', text: 'ยินดีต้อนรับคุณ ' + result.username, timer: 1500, showConfirmButton: false })
+                            .then(() => window.location.href = '/index.html');
                     }
                 } else { 
-                    Swal.fire('ผิดพลาด', result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error'); 
+                    Swal.fire('ล้มเหลว', result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error'); 
                 }
             } catch (err) { 
                 Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); 
@@ -142,13 +154,9 @@
             };
             
             try {
-                const res = await fetch('/api/register', { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(data) 
-                });
+                const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
                 if (res.ok) {
-                    Swal.fire('สำเร็จ!', 'สมัครสมาชิกเรียบร้อยแล้ว กรุณาล็อกอิน', 'success').then(() => toggleForm('login-section'));
+                    Swal.fire('สำเร็จ', 'สมัครสมาชิกเรียบร้อยแล้ว กรุณาเข้าสู่ระบบ', 'success').then(() => toggleForm('login-section'));
                 } else { 
                     Swal.fire('ผิดพลาด', 'ชื่อผู้ใช้นี้ถูกใช้งานไปแล้ว', 'error'); 
                 }
@@ -166,17 +174,12 @@
             };
             
             try {
-                const res = await fetch('/api/users/reset', { 
-                    method: 'PUT', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify(data) 
-                });
-                
+                const res = await fetch('/api/users/reset', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
                 if (res.ok) {
-                    Swal.fire('สำเร็จ!', 'เปลี่ยนรหัสผ่านใหม่เรียบร้อยแล้ว', 'success').then(() => toggleForm('login-section'));
+                    Swal.fire('สำเร็จ', 'อัปเดตรหัสผ่านใหม่เรียบร้อยแล้ว', 'success').then(() => toggleForm('login-section'));
                 } else { 
                     const result = await res.json();
-                    Swal.fire('ผิดพลาด', result.message || 'ไม่พบชื่อผู้ใช้งานนี้ในระบบ', 'error'); 
+                    Swal.fire('ไม่พบผู้ใช้', result.message || 'ไม่พบชื่อผู้ใช้งานนี้ในระบบ', 'error'); 
                 }
             } catch (err) { 
                 Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); 

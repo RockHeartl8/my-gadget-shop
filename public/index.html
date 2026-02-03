@@ -6,122 +6,126 @@
     <title>ROCKYSTORE - Professional IT Shop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-light: #f0f9ff; --sidebar-grad: linear-gradient(180deg, #e0f2fe 0%, #ffffff 100%); --accent-blue: #0ea5e9; --deep-blue: #0369a1; --navy-dark: #0f172a; }
-        body { font-family: 'Kanit', sans-serif; background: var(--bg-light); color: #1e293b; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-
-        .app-container { display: flex; flex: 1; }
-
-        /* Sidebar - จัดระเบียบตามร่างเดิม */
-        .sidebar { width: 260px; background: var(--sidebar-grad); border-right: 1px solid #bae6fd; padding: 20px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; }
-        .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 25px; }
-        .rock-icon { width: 65px; height: 55px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2); margin-bottom: 10px; }
-        .sidebar h1 { color: var(--navy-dark); text-align: center; margin: 0; font-weight: 800; font-size: 1.8rem; letter-spacing: -1px; text-transform: uppercase; }
+        :root { --bg-light: #f0f9ff; --sidebar-grad: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%); --accent-blue: #0ea5e9; --deep-blue: #0369a1; --navy-dark: #0f172a; --sidebar-w: 280px; }
         
-        /* สโลแกนร้าน */
-        .shop-slogan { font-size: 0.75rem; color: #64748b; margin-top: -5px; margin-bottom: 15px; text-align: center; font-weight: 400; }
+        body { font-family: 'Kanit', sans-serif; background: var(--bg-light); color: #1e293b; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        .category-item { padding: 10px 15px; margin: 4px 0; cursor: pointer; border-radius: 12px; transition: 0.3s; color: #64748b; display: flex; align-items: center; gap: 12px; font-size: 0.95rem; }
-        .category-item:hover, .category-item.active { background: white; color: var(--accent-blue); font-weight: 600; box-shadow: 0 4px 12px rgba(14,165,233,0.1); }
+        .app-container { display: flex; width: 100%; }
 
-        .main-content { flex: 1; padding: 25px; display: flex; flex-direction: column; gap: 25px; overflow-x: hidden; }
+        /* Sidebar ดีไซน์ใหม่ */
+        .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #bae6fd; padding: 30px 15px; position: fixed; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; transition: 0.3s; z-index: 1000; }
+        .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
+        .rock-icon { width: 65px; height: 55px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2); margin-bottom: 12px; }
+        .sidebar h1 { color: var(--navy-dark); text-align: center; margin: 0; font-weight: 800; font-size: 1.6rem; letter-spacing: -1px; text-transform: uppercase; }
+        .shop-slogan { font-size: 0.75rem; color: #64748b; margin-top: -2px; text-align: center; font-weight: 400; }
+
+        .category-item { padding: 12px 18px; margin: 5px 0; cursor: pointer; border-radius: 12px; transition: 0.3s; color: #64748b; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; font-weight: 500; }
+        .category-item i { width: 25px; font-size: 1.1rem; }
+        .category-item:hover, .category-item.active { background: #f0f9ff; color: var(--accent-blue); font-weight: 600; }
+        .category-item::after { content: '\f105'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 0.8rem; opacity: 0.4; }
+
+        /* Main Content */
+        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 25px; display: flex; flex-direction: column; gap: 25px; transition: 0.3s; width: calc(100% - var(--sidebar-w)); box-sizing: border-box; }
         
-        /* Toolbar & Auth UI */
-        .toolbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 12px 25px; border-radius: 18px; border: 1px solid #e0f2fe; box-shadow: 0 5px 15px rgba(0,0,0,0.02); }
-        .search-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid #bae6fd; border-radius: 10px; padding: 5px 15px; width: 45%; }
-        .search-box input { background: transparent; border: none; padding: 8px; width: 100%; outline: none; font-family: 'Kanit'; }
+        /* Toolbar */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 20px; border: 1px solid #e0f2fe; box-shadow: 0 8px 20px rgba(0,0,0,0.02); }
+        .search-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid #bae6fd; border-radius: 12px; padding: 6px 15px; width: 45%; }
+        .search-box input { background: transparent; border: none; padding: 8px; width: 100%; outline: none; font-family: 'Kanit'; font-size: 0.9rem; }
 
-        /* Carousel & Product Card */
-        .hero-section { background: white; border-radius: 20px; padding: 25px; border: 1px solid #bae6fd; }
-        .carousel-container { display: flex; overflow-x: auto; gap: 20px; padding: 10px 5px; scrollbar-width: thin; }
-        .carousel-item { min-width: 320px; background: #f8fafc; border-radius: 18px; padding: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid #e0f2fe; flex-shrink: 0; }
-        .carousel-item img { width: 100px; height: 100px; object-fit: contain; background: white; border-radius: 12px; padding: 5px; flex-shrink: 0; }
-
+        /* Product Cards */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 20px; padding: 20px; text-align: center; border: 1px solid #f0f9ff; box-shadow: 0 5px 15px rgba(0,0,0,0.02); transition: 0.3s; }
-        .card img { width: 100%; height: 150px; object-fit: contain; margin-bottom: 15px; background: #f8fafc; border-radius: 12px; padding: 8px; box-sizing: border-box; }
+        .card { background: white; border-radius: 24px; padding: 20px; text-align: center; border: 1px solid #f0f9ff; box-shadow: 0 10px 25px rgba(0,0,0,0.03); transition: 0.3s; position: relative; overflow: hidden; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(14,165,233,0.1); }
+        .card img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 15px; border-radius: 15px; background: #f8fafc; padding: 10px; box-sizing: border-box; }
         
-        .btn-group { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-detail { flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
-        .btn-add { flex: 1.5; background: linear-gradient(90deg, var(--deep-blue), var(--accent-blue)); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-detail { flex: 1; background: #f1f5f9; color: #475569; border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: 'Kanit'; font-size: 0.85rem; }
+        .btn-add { flex: 1.5; background: linear-gradient(90deg, var(--deep-blue), var(--accent-blue)); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: 'Kanit'; font-size: 0.85rem; }
 
-        .auth-container { display: flex; align-items: center; gap: 10px; }
+        /* Responsive Settings */
+        .hamburger { display: none; font-size: 1.5rem; color: var(--deep-blue); cursor: pointer; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 999; }
 
-        /* Footer Style */
-        footer { background: white; border-top: 1px solid #bae6fd; padding: 30px 20px; margin-top: 50px; }
-        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .contact-info { display: flex; gap: 30px; color: var(--navy-dark); font-size: 0.9rem; flex-wrap: wrap; justify-content: center; }
-        .contact-item { display: flex; align-items: center; gap: 8px; font-weight: 600; }
-        .contact-item i { color: var(--accent-blue); font-size: 1.1rem; }
+        @media (max-width: 992px) {
+            .sidebar { left: -100%; }
+            .sidebar.active { left: 0; }
+            .main-content { margin-left: 0; width: 100%; padding: 15px; }
+            .hamburger { display: block; }
+            .search-box { width: 40%; }
+            .overlay.active { display: block; }
+        }
+
+        @media (max-width: 600px) {
+            .toolbar { padding: 10px 15px; }
+            .search-box { display: none; } /* ซ่อนช่องค้นหาในมือถือเล็กเพื่อประหยัดพื้นที่ */
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+            .card { padding: 12px; border-radius: 18px; }
+            .card img { height: 120px; }
+        }
+
+        footer { background: white; border-top: 1px solid #bae6fd; padding: 40px 20px; margin-top: 50px; text-align: center; width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="sidebar">
-            <div class="logo-container">
-                <div class="rock-icon"><i class="fa-solid fa-gem" style="color:white"></i></div>
-                <h1>ROCKYSTORE</h1>
-                <div class="shop-slogan">ร้านขายอุปกรณ์คอมพิวเตอร์ทุกชนิด</div>
+    <div class="overlay" onclick="toggleMenu()"></div>
+
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="rock-icon"><i class="fa-solid fa-gem" style="color:white"></i></div>
+            <h1>ROCKYSTORE</h1>
+            <div class="shop-slogan">ร้านขายอุปกรณ์คอมพิวเตอร์ครบวงจร</div>
+        </div>
+        <div class="category-item active" onclick="filterCategory('all', this)"><span><i class="fa-solid fa-border-all"></i> สินค้าทั้งหมด</span></div>
+        <div class="category-item" onclick="filterCategory('monitor', this)"><span><i class="fa-solid fa-display"></i> จอคอม</span></div>
+        <div class="category-item" onclick="filterCategory('gpu', this)"><span><i class="fa-solid fa-microchip"></i> การ์ดจอ</span></div>
+        <div class="category-item" onclick="filterCategory('case', this)"><span><i class="fa-solid fa-box-open"></i> เคสคอม</span></div>
+        <div class="category-item" onclick="filterCategory('mainboard', this)"><span><i class="fa-solid fa-memory"></i> เมนบอร์ด</span></div>
+        <div class="category-item" onclick="filterCategory('cpu', this)"><span><i class="fa-solid fa-server"></i> ซีพียู</span></div>
+        <div class="category-item" onclick="filterCategory('ram', this)"><span><i class="fa-solid fa-hard-drive"></i> แรม</span></div>
+        <div class="category-item" onclick="filterCategory('ssd', this)"><span><i class="fa-solid fa-database"></i> SSD</span></div>
+        <div class="category-item" onclick="filterCategory('etc', this)"><span><i class="fa-solid fa-plug"></i> จิปาถะ</span></div>
+        <div style="flex-grow: 1;"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="toolbar">
+            <div class="hamburger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></div>
+            <h3 id="current-category" style="margin:0; color:var(--deep-blue); font-weight: 700;">หน้าร้านหลัก</h3>
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass" style="color:var(--accent-blue)"></i>
+                <input type="text" id="search-input" placeholder="ค้นหาอุปกรณ์..." onkeyup="searchProducts()">
             </div>
-            <div class="category-item active" onclick="filterCategory('all', this)"><i class="fa-solid fa-border-all"></i> สินค้าทั้งหมด</div>
-            <div class="category-item" onclick="filterCategory('monitor', this)"><i class="fa-solid fa-display"></i> จอคอม</div>
-            <div class="category-item" onclick="filterCategory('gpu', this)"><i class="fa-solid fa-microchip"></i> การ์ดจอ</div>
-            <div class="category-item" onclick="filterCategory('case', this)"><i class="fa-solid fa-box-open"></i> เคสคอม</div>
-            <div class="category-item" onclick="filterCategory('mainboard', this)"><i class="fa-solid fa-memory"></i> เมนบอร์ด</div>
-            <div class="category-item" onclick="filterCategory('cpu', this)"><i class="fa-solid fa-server"></i> ซีพียู</div>
-            <div class="category-item" onclick="filterCategory('ram', this)"><i class="fa-solid fa-hard-drive"></i> แรม</div>
-            <div class="category-item" onclick="filterCategory('ssd', this)"><i class="fa-solid fa-database"></i> ฮาร์ดดิส / SSD</div>
-            <div class="category-item" onclick="filterCategory('etc', this)"><i class="fa-solid fa-plug"></i> จิปาถะ</div>
-            <div style="flex-grow: 1;"></div>
+            <div style="display:flex; gap:20px; align-items:center;">
+                <div id="cart-section" style="cursor:pointer; position:relative;" onclick="showCartItems()">
+                    <i class="fa-solid fa-cart-shopping" style="color:var(--deep-blue); font-size:1.3rem;"></i>
+                    <span id="cart-count" style="position:absolute; top:-8px; right:-10px; background:#f43f5e; color:white; font-size:0.7rem; padding:2px 6px; border-radius:50%; font-weight:700; border:2px solid white;">0</span>
+                </div>
+                <div id="auth-display"></div>
+            </div>
         </div>
 
-        <div class="main-content">
-            <div class="toolbar">
-                <h3 id="current-category" style="margin:0; color:var(--deep-blue)">หน้าร้านหลัก</h3>
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass" style="color:var(--accent-blue)"></i>
-                    <input type="text" id="search-input" placeholder="ค้นหาอุปกรณ์..." onkeyup="searchProducts()">
-                </div>
-                <div style="display:flex; gap:20px; align-items:center;">
-                    <div id="cart-section" style="cursor:pointer; position:relative; font-size:1.3rem;" onclick="showCartItems()">
-                        <i class="fa-solid fa-cart-shopping" style="color:var(--deep-blue)"></i>
-                        <span id="cart-count" style="position:absolute; top:-5px; right:-10px; background:#f43f5e; color:white; font-size:0.7rem; padding:2px 6px; border-radius:50%; font-weight:700;">0</span>
-                    </div>
-                    <div id="auth-display"></div>
-                </div>
-            </div>
-
-            <div class="hero-section">
-                <h2 id="hero-title" style="margin:0 0 15px 0; font-size:1.3rem; color:var(--navy-dark);"><i class="fa-solid fa-fire" style="color:#ef4444"></i> สินค้าที่แนะนำ</h2>
-                <div class="carousel-container" id="hero-carousel"></div>
-            </div>
-
-            <div>
-                <h2 id="grid-title" style="margin:0 0 15px 0; font-size:1.3rem;"><i class="fa-solid fa-boxes-stacked"></i> อุปกรณ์คอมพิวเตอร์</h2>
-                <div class="product-grid" id="product-list"></div>
-            </div>
-        </div>
+        <div class="product-grid" id="product-list"></div>
     </div>
 
     <footer>
-        <div class="footer-content">
-            <div style="font-weight: 800; color: var(--navy-dark);">ROCKYSTORE CONTACT</div>
-            <div class="contact-info">
-                <div class="contact-item">
-                    <i class="fa-solid fa-phone"></i> 061-263-2933
-                </div>
-                <div class="contact-item">
-                    <i class="fa-solid fa-envelope"></i> RockHeart2548@gmail.com
-                </div>
-            </div>
-            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 10px;">&copy; 2026 RockyStore Thailand. All Rights Reserved.</div>
+        <div style="font-weight: 800; color: var(--navy-dark); margin-bottom: 15px;">ROCKYSTORE CONTACT</div>
+        <div style="display: flex; gap: 25px; justify-content: center; flex-wrap: wrap;">
+            <span style="font-weight: 600;"><i class="fa-solid fa-phone" style="color:var(--accent-blue)"></i> 061-263-2933</span>
+            <span style="font-weight: 600;"><i class="fa-solid fa-envelope" style="color:var(--accent-blue)"></i> RockHeart2548@gmail.com</span>
         </div>
+        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 20px;">&copy; 2026 RockyStore Thailand. All Rights Reserved.</div>
     </footer>
 
     <script>
         let allProducts = [], cart = [];
+
+        function toggleMenu() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        }
 
         async function fetchProducts() {
             try {
@@ -133,39 +137,19 @@
 
         function updateUI(category) {
             const list = document.getElementById('product-list');
-            const hero = document.getElementById('hero-carousel');
             const filtered = (category === 'all') ? allProducts : allProducts.filter(p => p.category === category);
-            
             const user = JSON.parse(localStorage.getItem('user'));
             const isAdmin = user && user.role === 'admin';
 
-            hero.innerHTML = filtered.slice(0, 5).map(p => {
-                const buyBtn = isAdmin ? '' : `<button onclick="addToCart('${p._id}')" style="background:var(--accent-blue); color:white; border:none; border-radius:6px; padding:4px 8px; cursor:pointer; font-size:0.7rem;">+ ตะกร้า</button>`;
-                return `
-                <div class="carousel-item">
-                    <img src="${p.img}" alt="${p.name}">
-                    <div class="carousel-info">
-                        <div style="font-weight:700; font-size:0.75rem; color:var(--accent-blue)">HOT DEAL</div>
-                        <div style="font-weight:600; font-size:0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.name}</div>
-                        <div style="color:var(--deep-blue); font-weight:700;">${p.price.toLocaleString()} ฿</div>
-                        <div style="display:flex; gap:5px;">
-                            <button onclick="viewDetail('${p._id}')" style="background:#fff; border:1px solid #ddd; border-radius:6px; padding:4px 8px; cursor:pointer; font-size:0.7rem;">รายละเอียด</button>
-                            ${buyBtn}
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-
             list.innerHTML = filtered.map(p => {
-                const buyBtn = isAdmin ? '' : `<button class="btn-add" onclick="addToCart('${p._id}')">เพิ่มลงตะกร้า</button>`;
-                const detailBtnStyle = isAdmin ? 'style="flex: 1; background: var(--accent-blue); color: white;"' : '';
+                const buyBtn = isAdmin ? '' : `<button class="btn-add" onclick="addToCart('${p._id}')">ลงตะกร้า</button>`;
                 return `
                 <div class="card">
                     <img src="${p.img}" alt="${p.name}">
-                    <div style="font-weight:600; font-size:0.95rem; height:2.4em; overflow:hidden;">${p.name}</div>
+                    <div style="font-weight:600; font-size:0.95rem; height:2.8em; overflow:hidden;">${p.name}</div>
                     <div style="color:var(--deep-blue); font-weight:700; font-size:1.2rem; margin:10px 0;">${p.price.toLocaleString()} ฿</div>
                     <div class="btn-group">
-                        <button class="btn-detail" onclick="viewDetail('${p._id}')" ${detailBtnStyle}>รายละเอียด</button>
+                        <button class="btn-detail" onclick="viewDetail('${p._id}')">รายละเอียด</button>
                         ${buyBtn}
                     </div>
                 </div>`;
@@ -174,16 +158,8 @@
 
         function addToCart(id) {
             const user = JSON.parse(localStorage.getItem('user'));
-            if (!user) {
-                return Swal.fire({
-                    title: 'กรุณาเข้าสู่ระบบ',
-                    text: 'คุณต้องล็อกอินก่อนจึงจะสามารถเพิ่มสินค้าลงรถเข็นได้',
-                    icon: 'warning',
-                    confirmButtonText: 'ไปหน้าล็อกอิน',
-                    showCancelButton: true,
-                    cancelButtonText: 'ปิด'
-                }).then((res) => { if (res.isConfirmed) window.location.href = '/login.html'; });
-            }
+            if (!user) return Swal.fire({ title: 'กรุณาล็อกอิน', text: 'ต้องเข้าสู่ระบบก่อนซื้อสินค้า', icon: 'warning', confirmButtonText: 'ไปหน้าล็อกอิน' }).then(r => { if(r.isConfirmed) window.location.href='/login.html' });
+            
             const p = allProducts.find(x => x._id === id);
             cart.push(p);
             document.getElementById('cart-count').innerText = cart.length;
@@ -195,69 +171,77 @@
             Swal.fire({ title: p.name, html: `<div style="text-align:left;"><b>ราคา:</b> ${p.price.toLocaleString()} ฿<br><b>หมวดหมู่:</b> ${p.category}</div>`, imageUrl: p.img, imageWidth: 300, confirmButtonColor: '#0ea5e9' });
         }
 
-        /* ฟังก์ชันตะกร้าและการชำระเงินที่สมบูรณ์ */
         function showCartItems() {
             if (cart.length === 0) return Swal.fire('ตะกร้าว่างเปล่า', '', 'info');
             const total = cart.reduce((sum, item) => sum + item.price, 0);
             Swal.fire({
                 title: '🛒 ตะกร้าสินค้าของคุณ',
-                html: `
-                    <div style="text-align:left; max-height:300px; overflow-y:auto; margin-bottom:15px;">
-                        ${cart.map((i, idx) => `
-                            <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
-                                <span style="font-size:0.9rem;">${idx + 1}. ${i.name}</span>
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <b>${i.price.toLocaleString()}฿</b>
-                                    <i class="fa-solid fa-trash" onclick="removeFromCart(${idx})" style="color:#f43f5e; cursor:pointer;"></i>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                    <h3 style="text-align:right; color:var(--deep-blue); border-top: 2px solid var(--accent-blue); padding-top:10px;">ยอดรวมทั้งสิ้น: ${total.toLocaleString()} ฿</h3>`,
-                showCancelButton: true, confirmButtonText: 'ชำระเงินทั้งหมด', cancelButtonText: 'เลือกต่อ', confirmButtonColor: '#6366f1'
+                html: `<div style="text-align:left; max-height:300px; overflow-y:auto;">
+                        ${cart.map((i, idx) => `<div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding:5px 0;">
+                            <span style="font-size:0.85rem;">${i.name}</span>
+                            <b>${i.price.toLocaleString()}฿ <i class="fa-solid fa-trash" onclick="removeFromCart(${idx})" style="color:#f43f5e; cursor:pointer; margin-left:8px;"></i></b>
+                        </div>`).join('')}
+                    </div><h3 style="text-align:right; color:var(--deep-blue); margin-top:15px;">ยอดรวม: ${total.toLocaleString()} ฿</h3>`,
+                showCancelButton: true, confirmButtonText: 'ชำระเงิน', cancelButtonText: 'เลือกต่อ', confirmButtonColor: '#0ea5e9'
             }).then((result) => { if (result.isConfirmed) processPayment(total); });
         }
 
-        function processPayment(amount) {
-            Swal.fire({ title: 'ยืนยันการชำระเงิน?', text: `ยอดรวม ${amount.toLocaleString()} ฿`, icon: 'question', showCancelButton: true, confirmButtonText: 'ใช่, ยืนยัน', confirmButtonColor: '#0ea5e9'
-            }).then((res) => {
+        async function processPayment(amount) {
+            const user = JSON.parse(localStorage.getItem('user'));
+            Swal.fire({ title: 'ยืนยันการชำระเงิน?', text: `ยอดรวม ${amount.toLocaleString()} ฿`, icon: 'question', showCancelButton: true, confirmButtonText: 'ยืนยัน' }).then(async (res) => {
                 if (res.isConfirmed) {
-                    Swal.fire({ title: 'กำลังประมวลผล...', didOpen: () => { Swal.showLoading() } });
-                    setTimeout(() => {
-                        Swal.fire('ชำระเงินสำเร็จ!', 'ขอบคุณที่ใช้บริการ RockyStore ครับ', 'success').then(() => {
-                            cart = []; document.getElementById('cart-count').innerText = '0'; updateUI('all');
-                        });
-                    }, 1500);
+                    const response = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: user.username, items: cart.map(i => i.name), total: amount }) });
+                    if (response.ok) {
+                        Swal.fire('สำเร็จ!', 'ขอบคุณที่ใช้บริการ RockyStore ครับ', 'success').then(() => { cart = []; document.getElementById('cart-count').innerText = '0'; updateUI('all'); });
+                    }
                 }
             });
         }
 
-        window.removeFromCart = function(index) {
-            cart.splice(index, 1);
-            document.getElementById('cart-count').innerText = cart.length;
-            Swal.close();
-            showCartItems();
-        };
+        window.removeFromCart = function(index) { cart.splice(index, 1); document.getElementById('cart-count').innerText = cart.length; Swal.close(); showCartItems(); };
 
         function checkAuth() {
             const user = JSON.parse(localStorage.getItem('user'));
             const authDisplay = document.getElementById('auth-display');
             if (user) {
-                authDisplay.innerHTML = `
-                    <div class="auth-container">
-                        <div style="background:#e0f2fe; padding:8px 15px; border-radius:12px; font-weight:600;">👤 ${user.username}</div>
-                        ${user.role === 'admin' ? `<a href="/admin.html" style="color:#6366f1; text-decoration:none; font-size:0.85rem; font-weight:600; border:1px solid #6366f1; padding:5px 10px; border-radius:8px;">⚙️ จัดการ</a>` : ''}
-                        <span onclick="logout()" style="color:#f43f5e; cursor:pointer; font-size:0.85rem; text-decoration:underline;">Logout</span>
+                authDisplay.innerHTML = `<div style="display:flex; align-items:center; gap:10px;">
+                        <span style="background:#e0f2fe; padding:6px 12px; border-radius:10px; font-weight:600; font-size:0.85rem;">👤 ${user.username}</span>
+                        ${user.role === 'admin' ? `<a href="/admin.html" style="color:#6366f1; font-weight:700; font-size:0.8rem;">[⚙️ ADMIN]</a>` : ''}
+                        <span onclick="logout()" style="color:#f43f5e; cursor:pointer; font-size:0.8rem; font-weight:600;">LOGOUT</span>
                     </div>`;
                 if (user.role === 'admin') document.getElementById('cart-section').style.display = 'none';
             } else {
-                authDisplay.innerHTML = `<a href="/login.html" style="background:#e0f2fe; color:var(--deep-blue); text-decoration:none; padding:8px 18px; border-radius:10px; font-weight:600; font-size:0.9rem;">👤 เข้าสู่ระบบ</a>`;
+                authDisplay.innerHTML = `<a href="/login.html" style="background:#e0f2fe; color:var(--deep-blue); text-decoration:none; padding:8px 18px; border-radius:12px; font-weight:700; font-size:0.85rem;">LOGIN</a>`;
             }
         }
 
         function logout() { localStorage.removeItem('user'); window.location.reload(); }
-        function filterCategory(cat, el) { document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active')); el.classList.add('active'); document.getElementById('current-category').innerText = el.innerText; updateUI(cat); }
-        function searchProducts() { /* ฟังก์ชันเดิม */ }
+        function filterCategory(cat, el) { 
+            document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active')); 
+            el.classList.add('active'); 
+            document.getElementById('current-category').innerText = el.innerText; 
+            updateUI(cat);
+            if(window.innerWidth <= 992) toggleMenu();
+        }
+        
+        function searchProducts() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term));
+            updateUI_List(filtered);
+        }
+
+        function updateUI_List(data) {
+            const list = document.getElementById('product-list');
+            const user = JSON.parse(localStorage.getItem('user'));
+            const isAdmin = user && user.role === 'admin';
+            list.innerHTML = data.map(p => `
+                <div class="card">
+                    <img src="${p.img}">
+                    <div style="font-weight:600;">${p.name}</div>
+                    <div style="color:var(--deep-blue); font-weight:700;">${p.price.toLocaleString()} ฿</div>
+                    <div class="btn-group"><button class="btn-detail" onclick="viewDetail('${p._id}')">รายละเอียด</button>${isAdmin ? '' : `<button class="btn-add" onclick="addToCart('${p._id}')">ลงตะกร้า</button>`}</div>
+                </div>`).join('');
+        }
 
         window.onload = () => { checkAuth(); fetchProducts(); };
     </script>
