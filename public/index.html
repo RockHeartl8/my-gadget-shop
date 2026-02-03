@@ -10,32 +10,15 @@
     <style>
         :root { --bg-light: #f8fafc; --accent-blue: #0ea5e9; --deep-blue: #0369a1; --navy-dark: #0f172a; --sidebar-w: 280px; }
         
-        body { font-family: 'Kanit', sans-serif; background: var(--bg-light); color: #1e293b; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Kanit', sans-serif; background: var(--bg-light); color: #1e293b; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
 
         .app-container { display: flex; width: 100%; }
 
-        /* Sidebar: เพิ่ม overflow-y: auto เพื่อให้เลื่อนได้เมื่อเมนูยาวเกินจอ */
-        .sidebar { 
-            width: var(--sidebar-w); 
-            background: white; 
-            border-right: 1px solid #e2e8f0; 
-            padding: 30px 15px; 
-            position: fixed; /* ล็อกตำแหน่ง */
-            top: 0;
-            bottom: 0;
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            box-sizing: border-box; 
-            transition: 0.3s; 
-            z-index: 1000; 
-            overflow-y: auto; /* [จุดสำคัญ] ทำให้มีแถบเลื่อน */
-        }
-
-        /* ปรับแต่ง Scrollbar ให้สวยงาม */
+        /* Sidebar Style */
+        .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #e2e8f0; padding: 30px 15px; position: fixed; top: 0; bottom: 0; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; transition: 0.3s; z-index: 1000; overflow-y: auto; }
         .sidebar::-webkit-scrollbar { width: 5px; }
         .sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-
+        
         .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; flex-shrink: 0; }
         .rock-icon { width: 65px; height: 55px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2); margin-bottom: 12px; }
         .sidebar h1 { color: var(--navy-dark); text-align: center; margin: 0; font-weight: 800; font-size: 1.6rem; letter-spacing: -1px; text-transform: uppercase; }
@@ -45,24 +28,24 @@
         .category-item:hover, .category-item.active { background: #f0f9ff; color: var(--accent-blue); font-weight: 600; }
         .category-item::after { content: '\f105'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 0.8rem; opacity: 0.4; }
 
-        /* Main Content: เว้นระยะซ้ายให้เท่ากับความกว้าง Sidebar */
-        .main-content { 
-            flex: 1; 
-            margin-left: var(--sidebar-w); 
-            padding: 25px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 25px; 
-            transition: 0.3s; 
-            width: calc(100% - var(--sidebar-w)); 
-            box-sizing: border-box; 
-            min-height: 100vh; 
-        }
+        /* Main Content */
+        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 25px; display: flex; flex-direction: column; gap: 25px; transition: 0.3s; width: calc(100% - var(--sidebar-w)); box-sizing: border-box; min-height: 100vh; }
         
-        /* Toolbar */
-        .toolbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: sticky; top: 20px; z-index: 900; }
-        .search-box { display: flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 6px 15px; width: 45%; }
+        /* Toolbar & Filters */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: sticky; top: 20px; z-index: 900; gap: 15px; flex-wrap: wrap; }
+        .search-box { display: flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 6px 15px; width: 35%; min-width: 200px; }
         .search-box input { background: transparent; border: none; padding: 8px; width: 100%; outline: none; font-family: 'Kanit'; font-size: 0.9rem; }
+        
+        .filter-sort { padding: 8px 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-family: 'Kanit'; color: #64748b; outline: none; font-size: 0.9rem; cursor: pointer; }
+
+        /* Best Seller Carousel */
+        .hero-section { margin-bottom: 10px; }
+        .carousel-container { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px; scrollbar-width: none; }
+        .carousel-container::-webkit-scrollbar { display: none; }
+        .carousel-item { min-width: 260px; background: white; border-radius: 18px; padding: 15px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.3s; cursor: pointer; }
+        .carousel-item:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(14,165,233,0.1); border-color: var(--accent-blue); }
+        .carousel-item img { width: 80px; height: 80px; object-fit: contain; background: #f8fafc; border-radius: 10px; padding: 5px; }
+        .rank-badge { background: #f43f5e; color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; display: inline-block; }
 
         /* Product Cards */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
@@ -79,23 +62,20 @@
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; backdrop-filter: blur(4px); }
 
         @media (max-width: 992px) {
-            .sidebar { left: -100%; } /* ซ่อน Sidebar ในมือถือ */
+            .sidebar { left: -100%; }
             .sidebar.active { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
-            
-            /* ดันเนื้อหาให้เต็มจอเมื่อไม่มี Sidebar */
             .main-content { margin-left: 0; width: 100%; padding: 15px; }
-            
             .hamburger { display: block; }
-            .search-box { width: 40%; }
+            .search-box { display: none; }
             .overlay.active { display: block; }
-            .toolbar { position: static; margin-bottom: 20px; } /* ปลด Sticky ในมือถือกันบัง */
+            .toolbar { position: static; margin-bottom: 20px; }
         }
 
         @media (max-width: 600px) {
-            .product-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; } /* ปรับ Grid มือถือให้วางได้ 2 แถว */
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
             .card { padding: 12px; border-radius: 16px; }
             .card img { height: 120px; }
-            .search-box { display: none; } /* ซ่อนค้นหาในจอเล็กสุดๆ */
+            .carousel-item { min-width: 220px; padding: 10px; }
         }
 
         footer { background: white; border-top: 1px solid #e2e8f0; padding: 40px 20px; margin-top: auto; text-align: center; width: 100%; box-sizing: border-box; }
@@ -125,12 +105,22 @@
 
     <div class="main-content">
         <div class="toolbar">
-            <div class="hamburger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></div>
-            <h3 id="current-category" style="margin:0; color:var(--deep-blue); font-weight: 700;">หน้าร้านหลัก</h3>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <div class="hamburger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></div>
+                <h3 id="current-category" style="margin:0; color:var(--deep-blue); font-weight: 700;">หน้าร้านหลัก</h3>
+            </div>
+            
             <div class="search-box">
                 <i class="fa-solid fa-magnifying-glass" style="color:var(--accent-blue)"></i>
                 <input type="text" id="search-input" placeholder="ค้นหาอุปกรณ์..." onkeyup="searchProducts()">
             </div>
+
+            <select class="filter-sort" id="price-sort" onchange="applySort()">
+                <option value="default">เรียงตาม: แนะนำ</option>
+                <option value="asc">ราคา: ต่ำ -> สูง</option>
+                <option value="desc">ราคา: สูง -> ต่ำ</option>
+            </select>
+
             <div style="display:flex; gap:20px; align-items:center;">
                 <div id="cart-section" style="cursor:pointer; position:relative;" onclick="showCartItems()">
                     <i class="fa-solid fa-cart-shopping" style="color:var(--deep-blue); font-size:1.3rem;"></i>
@@ -138,6 +128,11 @@
                 </div>
                 <div id="auth-display"></div>
             </div>
+        </div>
+
+        <div class="hero-section">
+            <h4 style="margin:0 0 10px 5px; color:var(--navy-dark); display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-fire" style="color:#f43f5e;"></i> สินค้าขายดีประจำสัปดาห์ (Top 5)</h4>
+            <div class="carousel-container" id="best-seller-list"></div>
         </div>
 
         <div class="product-grid" id="product-list"></div>
@@ -154,6 +149,7 @@
 
     <script>
         let allProducts = [], cart = [];
+        let currentFiltered = []; // เก็บรายการที่กรองแล้วเพื่อใช้ Sort ต่อ
 
         function toggleMenu() {
             document.querySelector('.sidebar').classList.toggle('active');
@@ -165,13 +161,55 @@
                 const res = await fetch('/api/products');
                 allProducts = await res.json();
                 updateUI('all');
-            } catch (err) { console.error("Error fetching products:", err); }
+                renderBestSellers(); // สร้างรายการขายดี
+            } catch (err) { console.error("Error:", err); }
+        }
+
+        // ฟังก์ชันสร้าง Carousel สินค้าขายดี 5 อันดับ (จำลองโดยการสุ่มหรือเรียงตามสต็อกถ้ามี)
+        function renderBestSellers() {
+            // สมมติว่าเรียงตามราคาแพงสุดไปก่อนเพื่อความสวยงาม (หรือจะใช้ Logic อื่นก็ได้)
+            const top5 = [...allProducts].sort((a,b) => b.price - a.price).slice(0, 5);
+            const container = document.getElementById('best-seller-list');
+            
+            container.innerHTML = top5.map((p, i) => `
+                <div class="carousel-item" onclick="viewDetail('${p._id}')">
+                    <img src="${p.img}" alt="${p.name}">
+                    <div style="flex:1; min-width:0;">
+                        <span class="rank-badge">อันดับ #${i+1}</span>
+                        <div style="font-weight:600; font-size:0.85rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
+                        <div style="color:var(--accent-blue); font-weight:700;">${p.price.toLocaleString()} ฿</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterCategory(cat, el) { 
+            document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active')); 
+            el.classList.add('active'); 
+            document.getElementById('current-category').innerText = el.innerText; 
+            updateUI(cat);
+            if(window.innerWidth <= 992) toggleMenu();
         }
 
         function updateUI(category) {
-            const list = document.getElementById('product-list');
-            const filtered = (category === 'all') ? allProducts : allProducts.filter(p => p.category === category);
-            updateUI_List(filtered);
+            // กรองข้อมูล
+            currentFiltered = (category === 'all') ? [...allProducts] : allProducts.filter(p => p.category === category);
+            applySort(); // เรียกใช้การเรียงลำดับต่อทันที
+        }
+
+        // ฟังก์ชันเรียงลำดับราคา
+        function applySort() {
+            const sortType = document.getElementById('price-sort').value;
+            let displayData = [...currentFiltered];
+
+            if (sortType === 'asc') {
+                displayData.sort((a, b) => a.price - b.price);
+            } else if (sortType === 'desc') {
+                displayData.sort((a, b) => b.price - a.price);
+            }
+            // ถ้า default ก็ใช้ลำดับเดิมจาก Database
+
+            updateUI_List(displayData);
         }
 
         function updateUI_List(data) {
@@ -194,6 +232,13 @@
             }).join('');
         }
 
+        function searchProducts() {
+            const term = document.getElementById('search-input').value.toLowerCase();
+            currentFiltered = allProducts.filter(p => p.name.toLowerCase().includes(term));
+            applySort();
+        }
+
+        // --- Functions เดิม (ห้ามหาย) ---
         function addToCart(id) {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user) return Swal.fire({ title: 'กรุณาล็อกอิน', text: 'ต้องเข้าสู่ระบบก่อนซื้อสินค้า', icon: 'warning', confirmButtonText: 'ไปหน้าล็อกอิน' }).then(r => { if(r.isConfirmed) window.location.href='/login.html' });
@@ -258,20 +303,6 @@
         }
 
         function logout() { localStorage.removeItem('user'); window.location.reload(); }
-
-        function filterCategory(cat, el) { 
-            document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active')); 
-            el.classList.add('active'); 
-            document.getElementById('current-category').innerText = el.innerText; 
-            updateUI(cat);
-            if(window.innerWidth <= 992) toggleMenu();
-        }
-        
-        function searchProducts() {
-            const term = document.getElementById('search-input').value.toLowerCase();
-            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term));
-            updateUI_List(filtered);
-        }
 
         window.onload = () => { checkAuth(); fetchProducts(); };
     </script>

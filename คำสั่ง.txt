@@ -1,3 +1,6 @@
 ส่งขึ้นเซิฟ
 
-git add . && git commit -m "Update RockyStore: Add Categories and Sorting" && git push origin main
+git add . && git commit -m "Update RockyStore" && git push origin main
+
+
+แก้ไฟล์ให้เป็น Responsive และแก้ฟอนต์ให้สวยงามเหมาะสม โดยที่ห้ามเอาหรือลืมฟังก์ชั่นใดๆเด็ดขาด
