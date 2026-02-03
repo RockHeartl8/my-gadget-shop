@@ -8,38 +8,20 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { 
-            --bg-light: #f0f9ff; 
-            --accent-blue: #0ea5e9; 
-            --deep-blue: #0369a1; 
-            --white: #ffffff;
-            --text-gray: #64748b;
-            --success-green: #10b981;
-            --danger-red: #f43f5e;
-        }
-
+        :root { --bg-light: #f0f9ff; --accent-blue: #0ea5e9; --deep-blue: #0369a1; --white: #ffffff; --text-gray: #64748b; --success-green: #10b981; --danger-red: #f43f5e; }
         body { font-family: 'Kanit', sans-serif; background: var(--bg-light); margin: 0; padding: 40px 20px; }
         .container { max-width: 900px; margin: auto; }
 
-        /* แผงควบคุมดีไซน์เดิม */
-        .admin-panel { 
-            background: var(--white); padding: 35px; border-radius: 24px; 
-            box-shadow: 0 15px 35px rgba(14, 165, 233, 0.08); border: 1px solid #e0f2fe; margin-bottom: 30px;
-        }
+        .admin-panel, .stats-card { background: var(--white); padding: 35px; border-radius: 24px; box-shadow: 0 15px 35px rgba(14, 165, 233, 0.08); border: 1px solid #e0f2fe; margin-bottom: 30px; }
+        h2, h3 { color: var(--deep-blue); text-align: center; margin-bottom: 25px; font-weight: 800; }
 
-        h2, h3 { color: var(--deep-blue); text-align: center; margin-bottom: 30px; font-weight: 800; }
+        /* ส่วนรายงานยอดขาย */
+        .revenue-box { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 25px; }
+        
+        /* ระบบ Filter ใหม่ */
+        .filter-section { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .filter-select { padding: 8px 15px; border-radius: 10px; border: 1px solid #bae6fd; font-family: 'Kanit'; outline: none; cursor: pointer; }
 
-        /* ส่วนรายงานยอดขาย (เพิ่มใหม่) */
-        .stats-card {
-            background: white; padding: 30px; border-radius: 24px;
-            border: 1px solid #e0f2fe; margin-bottom: 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.02);
-        }
-        .revenue-box {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white; padding: 20px; border-radius: 15px;
-            text-align: center; margin-bottom: 25px;
-        }
         .sales-table { width: 100%; border-collapse: collapse; }
         .sales-table th, .sales-table td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
         .sales-table th { color: var(--deep-blue); font-weight: 700; background: #f8fafc; }
@@ -63,10 +45,18 @@
         <a href="/index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> กลับไปหน้าร้านหลัก</a>
         
         <div class="stats-card">
-            <h3>📊 รายงานสรุปยอดขาย (เรียงจากน้อยไปมาก)</h3>
+            <h3>📊 สรุปยอดจำหน่ายสินค้า</h3>
             <div class="revenue-box">
-                <div style="font-size: 0.9rem; opacity: 0.9;">ยอดรวมรายได้ทั้งหมด</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">ยอดรายได้ทั้งหมดจากออเดอร์</div>
                 <div id="total-revenue" style="font-size: 2rem; font-weight: 800;">0 ฿</div>
+            </div>
+
+            <div class="filter-section">
+                <label style="font-size: 0.9rem; color: var(--text-gray);">เรียงตามจำนวน:</label>
+                <select id="sales-filter" class="filter-select" onchange="loadSalesStats()">
+                    <option value="asc">น้อยไปมาก ↑</option>
+                    <option value="desc">มากไปน้อย ↓</option>
+                </select>
             </div>
             
             <table class="sales-table">
@@ -74,16 +64,15 @@
                     <tr>
                         <th>อันดับ</th>
                         <th>ชื่อสินค้า</th>
-                        <th>จำนวนที่ขายได้</th>
+                        <th>ยอดขายสะสม</th>
                     </tr>
                 </thead>
-                <tbody id="sales-stats-list">
-                    </tbody>
+                <tbody id="sales-stats-list"></tbody>
             </table>
         </div>
 
         <div class="admin-panel">
-            <h2>📦 จัดการสินค้า RockyStore</h2>
+            <h2>📦 จัดการคลังสินค้า RockyStore</h2>
             <div class="input-grid">
                 <input type="text" id="name" placeholder="ชื่ออุปกรณ์ (เช่น RTX 4070)">
                 <input type="number" id="price" placeholder="ราคา (บาท)">
@@ -100,30 +89,27 @@
                 </select>
                 <button class="btn-add" onclick="addProduct()">เพิ่มสินค้าเข้าคลัง</button>
             </div>
-
-            <div class="product-list" id="admin-display">
-                </div>
+            <div class="product-list" id="admin-display"></div>
         </div>
     </div>
 
     <script>
-        // ตรวจสอบสิทธิ์ (ฟังก์ชันเดิม)
         const user = JSON.parse(localStorage.getItem('user'));
-        if (!user || user.role !== 'admin') {
-            window.location.href = '/login.html';
-        }
+        if (!user || user.role !== 'admin') window.location.href = '/login.html';
 
-        // ฟังก์ชันโหลดรายงานยอดขาย (เพิ่มใหม่)
+        // แก้ไขฟังก์ชันโหลดออเดอร์ให้ทำงานได้จริง
         async function loadSalesStats() {
             try {
-                const res = await fetch('/api/orders'); // ดึงข้อมูล Order จากฐานข้อมูล
+                const res = await fetch('/api/orders'); 
                 const orders = await res.json();
+                const filterType = document.getElementById('sales-filter').value;
                 
                 let revenue = 0;
                 let productCounts = {};
 
                 orders.forEach(order => {
                     revenue += order.total;
+                    // นับจำนวนสินค้าแต่ละชิ้นจากออเดอร์
                     order.items.forEach(itemName => {
                         productCounts[itemName] = (productCounts[itemName] || 0) + 1;
                     });
@@ -131,39 +117,28 @@
 
                 document.getElementById('total-revenue').innerText = `${revenue.toLocaleString()} ฿`;
 
-                // จัดเรียงจากน้อยไปมากตามที่คุณต้องการ
+                // ระบบ Filter กรองข้อมูล
                 const sortedStats = Object.keys(productCounts).map(name => ({
                     name: name,
                     count: productCounts[name]
-                })).sort((a, b) => a.count - b.count);
+                })).sort((a, b) => filterType === 'asc' ? a.count - b.count : b.count - a.count);
 
                 const listBody = document.getElementById('sales-stats-list');
-                listBody.innerHTML = sortedStats.map((stat, index) => `
+                listBody.innerHTML = sortedStats.length > 0 ? sortedStats.map((stat, index) => `
                     <tr>
                         <td>${index + 1}</td>
                         <td>${stat.name}</td>
                         <td class="${stat.count < 2 ? 'low-sale' : ''}">${stat.count} ชิ้น</td>
                     </tr>
-                `).join('');
+                `).join('') : '<tr><td colspan="3" style="text-align:center; padding:20px; color:#94a3b8;">ยังไม่มีประวัติยอดซื้อในระบบ</td></tr>';
             } catch (err) { console.error("Stats Error:", err); }
         }
 
-        // ฟังก์ชันจัดการสินค้า (ฟังก์ชันเดิมเป๊ะๆ)
+        // ฟังก์ชันเดิมห้ามลืม
         async function addProduct() {
-            const data = {
-                name: document.getElementById('name').value,
-                price: Number(document.getElementById('price').value),
-                img: document.getElementById('img').value,
-                category: document.getElementById('category').value
-            };
-            const res = await fetch('/api/products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) {
-                Swal.fire('สำเร็จ!', 'เพิ่มข้อมูลสินค้าแล้ว', 'success').then(() => location.reload());
-            }
+            const data = { name: document.getElementById('name').value, price: Number(document.getElementById('price').value), img: document.getElementById('img').value, category: document.getElementById('category').value };
+            const res = await fetch('/api/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            if (res.ok) Swal.fire('สำเร็จ!', 'เพิ่มสินค้าเข้าคลังแล้ว', 'success').then(() => location.reload());
         }
 
         async function loadAdminItems() {
@@ -171,28 +146,21 @@
             const data = await res.json();
             document.getElementById('admin-display').innerHTML = data.map(p => `
                 <div class="product-item">
-                    <div class="prod-info">
-                        <b>${p.name}</b>
-                        <span>${p.price.toLocaleString()} บาท <span class="badge">${p.category}</span></span>
-                    </div>
+                    <div class="prod-info"><b>${p.name}</b><span>${p.price.toLocaleString()} ฿ <span class="badge">${p.category}</span></span></div>
                     <button class="btn-del" onclick="deleteItem('${p._id}')">ลบสินค้า</button>
                 </div>
             `).join('');
         }
 
         async function deleteItem(id) {
-            if (confirm('ยืนยันการลบสินค้านี้ออกจากคลัง?')) {
+            if (confirm('ยืนยันการลบสินค้านี้?')) {
                 await fetch(`/api/products/${id}`, { method: 'DELETE' });
                 loadAdminItems();
-                loadSalesStats(); // รีโหลดสถิติด้วย
+                loadSalesStats();
             }
         }
 
-        // รันทุกฟังก์ชันเมื่อโหลดหน้า
-        window.onload = () => {
-            loadAdminItems();
-            loadSalesStats();
-        };
+        window.onload = () => { loadAdminItems(); loadSalesStats(); };
     </script>
 </body>
 </html>
