@@ -5,7 +5,7 @@ const app = express();
 
 // --- 1. Middleware ---
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // เพิ่ม Limit เพื่อรองรับรูปภาพ Base64
 app.use(express.static('public')); 
 
 // --- 2. Database Connection ---
@@ -22,18 +22,20 @@ const User = mongoose.model('User', {
     cart: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }] 
 });
 
+// อัปเดต Schema ให้รองรับ Description
 const Product = mongoose.model('Product', { 
     name: String, 
     price: Number, 
     img: String, 
     category: String, 
+    description: { type: String, default: '' }, // เพิ่มฟิลด์ใหม่
     stock: { type: Number, default: 10 } 
 });
 
 const Order = mongoose.model('Order', {
     username: String,
-    items: [String], // รายชื่อสินค้าที่ถูกซื้อ
-    total: Number,   // ยอดรวมเงินในบิลนั้น
+    items: [String], 
+    total: Number,   
     date: { type: Date, default: Date.now }
 });
 
@@ -62,6 +64,17 @@ app.post('/api/products', async (req, res) => {
     }
 });
 
+// **API ใหม่: แก้ไขข้อมูลสินค้า (PUT)**
+app.put('/api/products/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updatedProduct = await Product.findByIdAndUpdate(id, req.body, { new: true });
+        res.json(updatedProduct);
+    } catch (err) {
+        res.status(500).json({ message: "แก้ไขข้อมูลไม่สำเร็จ" });
+    }
+});
+
 app.delete('/api/products/:id', async (req, res) => {
     try {
         await Product.findByIdAndDelete(req.params.id);
@@ -86,11 +99,9 @@ app.post('/api/login', async (req, res) => {
     else res.status(401).json({ message: "ข้อมูลผิด" });
 });
 
-// **ส่วนที่เพิ่มใหม่: API สำหรับรีเซ็ทรหัสผ่าน**
 app.put('/api/users/reset', async (req, res) => {
     try {
         const { username, password } = req.body;
-        // ค้นหา User และอัปเดตรหัสผ่านใหม่
         const user = await User.findOneAndUpdate(
             { username: username }, 
             { password: password }, 
@@ -100,7 +111,6 @@ app.put('/api/users/reset', async (req, res) => {
         if (user) {
             res.json({ message: "รีเซ็ทรหัสผ่านสำเร็จ" });
         } else {
-            // กรณีไม่พบชื่อผู้ใช้
             res.status(404).json({ message: "ไม่พบชื่อผู้ใช้งานนี้ในระบบ" });
         }
     } catch (err) {
