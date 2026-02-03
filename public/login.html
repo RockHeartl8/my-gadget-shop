@@ -16,7 +16,6 @@
         
         h2 { color: var(--deep-blue); margin-bottom: 25px; font-weight: 800; font-size: 1.8rem; }
         
-        /* สไตล์ฟอร์มซ่อน/แสดง */
         .form-section { display: none; }
         .form-section.active { display: block; animation: slideUp 0.4s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -95,52 +94,93 @@
     </div>
 
     <script>
-        // ฟังก์ชันสลับหน้าจอ
+        // ฟังก์ชันสลับหน้าจอพร้อมล้างข้อมูลเก่า
         function toggleForm(id) {
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            // ล้างข้อมูลในช่องกรอกทุกครั้งที่สลับหน้า
+            document.querySelectorAll('input').forEach(input => input.value = '');
         }
 
         // --- ระบบ Login ---
         async function handleLogin(e) {
             e.preventDefault();
-            const data = { username: document.getElementById('login-user').value, password: document.getElementById('login-pass').value };
+            const data = { 
+                username: document.getElementById('login-user').value.trim(), 
+                password: document.getElementById('login-pass').value 
+            };
+            
             try {
-                const res = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const res = await fetch('/api/login', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(data) 
+                });
                 const result = await res.json();
+                
                 if (res.ok) {
                     localStorage.setItem('user', JSON.stringify(result));
                     if (result.role === 'admin') {
-                        Swal.fire('ยินดีต้อนรับ Admin', 'กำลังไปหน้าจัดการ...', 'success').then(() => window.location.href = '/admin.html');
+                        Swal.fire('ยินดีต้อนรับ Admin', 'กำลังเข้าสู่ระบบจัดการ...', 'success').then(() => window.location.href = '/admin.html');
                     } else {
                         Swal.fire('สำเร็จ!', 'ยินดีต้อนรับคุณ ' + result.username, 'success').then(() => window.location.href = '/index.html');
                     }
-                } else { Swal.fire('ผิดพลาด', result.message, 'error'); }
-            } catch (err) { Swal.fire('Error', 'เซิร์ฟเวอร์ขัดข้อง', 'error'); }
+                } else { 
+                    Swal.fire('ผิดพลาด', result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error'); 
+                }
+            } catch (err) { 
+                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); 
+            }
         }
 
         // --- ระบบ Register ---
         async function handleRegister(e) {
             e.preventDefault();
-            const data = { username: document.getElementById('reg-user').value, password: document.getElementById('reg-pass').value };
+            const data = { 
+                username: document.getElementById('reg-user').value.trim(), 
+                password: document.getElementById('reg-pass').value 
+            };
+            
             try {
-                const res = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const res = await fetch('/api/register', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(data) 
+                });
                 if (res.ok) {
-                    Swal.fire('สำเร็จ!', 'สมัครสมาชิกเรียบร้อยแล้ว', 'success').then(() => toggleForm('login-section'));
-                } else { Swal.fire('ผิดพลาด', 'ชื่อผู้ใช้นี้อาจถูกใช้งานแล้ว', 'error'); }
-            } catch (err) { Swal.fire('Error', 'เซิร์ฟเวอร์ขัดข้อง', 'error'); }
+                    Swal.fire('สำเร็จ!', 'สมัครสมาชิกเรียบร้อยแล้ว กรุณาล็อกอิน', 'success').then(() => toggleForm('login-section'));
+                } else { 
+                    Swal.fire('ผิดพลาด', 'ชื่อผู้ใช้นี้ถูกใช้งานไปแล้ว', 'error'); 
+                }
+            } catch (err) { 
+                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); 
+            }
         }
 
         // --- ระบบ Reset Password ---
         async function handleReset(e) {
             e.preventDefault();
-            const data = { username: document.getElementById('reset-user').value, password: document.getElementById('reset-pass').value };
+            const data = { 
+                username: document.getElementById('reset-user').value.trim(), 
+                password: document.getElementById('reset-pass').value 
+            };
+            
             try {
-                const res = await fetch('/api/users/reset', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const res = await fetch('/api/users/reset', { 
+                    method: 'PUT', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(data) 
+                });
+                
                 if (res.ok) {
-                    Swal.fire('สำเร็จ!', 'เปลี่ยนรหัสผ่านใหม่เรียบร้อย', 'success').then(() => toggleForm('login-section'));
-                } else { Swal.fire('ผิดพลาด', 'ไม่พบชื่อผู้ใช้งานนี้ในระบบ', 'error'); }
-            } catch (err) { Swal.fire('Error', 'เซิร์ฟเวอร์ขัดข้อง', 'error'); }
+                    Swal.fire('สำเร็จ!', 'เปลี่ยนรหัสผ่านใหม่เรียบร้อยแล้ว', 'success').then(() => toggleForm('login-section'));
+                } else { 
+                    const result = await res.json();
+                    Swal.fire('ผิดพลาด', result.message || 'ไม่พบชื่อผู้ใช้งานนี้ในระบบ', 'error'); 
+                }
+            } catch (err) { 
+                Swal.fire('Error', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error'); 
+            }
         }
     </script>
 </body>

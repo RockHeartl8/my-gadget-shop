@@ -86,7 +86,28 @@ app.post('/api/login', async (req, res) => {
     else res.status(401).json({ message: "ข้อมูลผิด" });
 });
 
-// ดึงข้อมูล User ทั้งหมดสำหรับ Admin Dashboard
+// **ส่วนที่เพิ่มใหม่: API สำหรับรีเซ็ทรหัสผ่าน**
+app.put('/api/users/reset', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        // ค้นหา User และอัปเดตรหัสผ่านใหม่
+        const user = await User.findOneAndUpdate(
+            { username: username }, 
+            { password: password }, 
+            { new: true }
+        );
+
+        if (user) {
+            res.json({ message: "รีเซ็ทรหัสผ่านสำเร็จ" });
+        } else {
+            // กรณีไม่พบชื่อผู้ใช้
+            res.status(404).json({ message: "ไม่พบชื่อผู้ใช้งานนี้ในระบบ" });
+        }
+    } catch (err) {
+        res.status(500).json({ message: "เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล" });
+    }
+});
+
 app.get('/api/users', async (req, res) => {
     try {
         const users = await User.find();
@@ -96,7 +117,6 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-// ลบสมาชิกออกจากระบบ
 app.delete('/api/users/:id', async (req, res) => {
     try {
         await User.findByIdAndDelete(req.params.id);
