@@ -14,7 +14,7 @@
 
         .app-container { display: flex; width: 100%; }
 
-        /* Sidebar ดีไซน์ใหม่ */
+        /* Sidebar ดีไซน์เดิม */
         .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #bae6fd; padding: 30px 15px; position: fixed; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; transition: 0.3s; z-index: 1000; }
         .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
         .rock-icon { width: 65px; height: 55px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2); margin-bottom: 12px; }
@@ -59,7 +59,7 @@
 
         @media (max-width: 600px) {
             .toolbar { padding: 10px 15px; }
-            .search-box { display: none; } /* ซ่อนช่องค้นหาในมือถือเล็กเพื่อประหยัดพื้นที่ */
+            .search-box { display: none; }
             .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
             .card { padding: 12px; border-radius: 18px; }
             .card img { height: 120px; }
@@ -122,6 +122,7 @@
     <script>
         let allProducts = [], cart = [];
 
+        // ฟังก์ชัน Toggle Sidebar สำหรับมือถือ
         function toggleMenu() {
             document.querySelector('.sidebar').classList.toggle('active');
             document.querySelector('.overlay').classList.toggle('active');
@@ -138,10 +139,16 @@
         function updateUI(category) {
             const list = document.getElementById('product-list');
             const filtered = (category === 'all') ? allProducts : allProducts.filter(p => p.category === category);
+            updateUI_List(filtered);
+        }
+
+        // ฟังก์ชันอัปเดตรายการสินค้า (รองรับทั้งกรองและค้นหา)
+        function updateUI_List(data) {
+            const list = document.getElementById('product-list');
             const user = JSON.parse(localStorage.getItem('user'));
             const isAdmin = user && user.role === 'admin';
-
-            list.innerHTML = filtered.map(p => {
+            
+            list.innerHTML = data.map(p => {
                 const buyBtn = isAdmin ? '' : `<button class="btn-add" onclick="addToCart('${p._id}')">ลงตะกร้า</button>`;
                 return `
                 <div class="card">
@@ -186,11 +193,16 @@
             }).then((result) => { if (result.isConfirmed) processPayment(total); });
         }
 
+        // ฟังก์ชันชำระเงินและบันทึกออเดอร์
         async function processPayment(amount) {
             const user = JSON.parse(localStorage.getItem('user'));
             Swal.fire({ title: 'ยืนยันการชำระเงิน?', text: `ยอดรวม ${amount.toLocaleString()} ฿`, icon: 'question', showCancelButton: true, confirmButtonText: 'ยืนยัน' }).then(async (res) => {
                 if (res.isConfirmed) {
-                    const response = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: user.username, items: cart.map(i => i.name), total: amount }) });
+                    const response = await fetch('/api/orders', { 
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' }, 
+                        body: JSON.stringify({ username: user.username, items: cart.map(i => i.name), total: amount }) 
+                    });
                     if (response.ok) {
                         Swal.fire('สำเร็จ!', 'ขอบคุณที่ใช้บริการ RockyStore ครับ', 'success').then(() => { cart = []; document.getElementById('cart-count').innerText = '0'; updateUI('all'); });
                     }
@@ -216,31 +228,19 @@
         }
 
         function logout() { localStorage.removeItem('user'); window.location.reload(); }
+
         function filterCategory(cat, el) { 
             document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active')); 
             el.classList.add('active'); 
             document.getElementById('current-category').innerText = el.innerText; 
             updateUI(cat);
-            if(window.innerWidth <= 992) toggleMenu();
+            if(window.innerWidth <= 992) toggleMenu(); // ปิดเมนูอัตโนมัติหลังเลือกหมวดหมู่ในมือถือ
         }
         
         function searchProducts() {
             const term = document.getElementById('search-input').value.toLowerCase();
             const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term));
             updateUI_List(filtered);
-        }
-
-        function updateUI_List(data) {
-            const list = document.getElementById('product-list');
-            const user = JSON.parse(localStorage.getItem('user'));
-            const isAdmin = user && user.role === 'admin';
-            list.innerHTML = data.map(p => `
-                <div class="card">
-                    <img src="${p.img}">
-                    <div style="font-weight:600;">${p.name}</div>
-                    <div style="color:var(--deep-blue); font-weight:700;">${p.price.toLocaleString()} ฿</div>
-                    <div class="btn-group"><button class="btn-detail" onclick="viewDetail('${p._id}')">รายละเอียด</button>${isAdmin ? '' : `<button class="btn-add" onclick="addToCart('${p._id}')">ลงตะกร้า</button>`}</div>
-                </div>`).join('');
         }
 
         window.onload = () => { checkAuth(); fetchProducts(); };
