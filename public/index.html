@@ -8,36 +8,35 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-light: #f0f9ff; --sidebar-grad: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%); --accent-blue: #0ea5e9; --deep-blue: #0369a1; --navy-dark: #0f172a; --sidebar-w: 280px; }
+        :root { --bg-light: #f8fafc; --accent-blue: #0ea5e9; --deep-blue: #0369a1; --navy-dark: #0f172a; --sidebar-w: 280px; }
         
         body { font-family: 'Kanit', sans-serif; background: var(--bg-light); color: #1e293b; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
 
         .app-container { display: flex; width: 100%; }
 
-        /* Sidebar ดีไซน์เดิม */
-        .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #bae6fd; padding: 30px 15px; position: fixed; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; transition: 0.3s; z-index: 1000; }
+        /* Sidebar: แก้ไขให้ล็อกตำแหน่งถาวรไม่ให้เบียดเนื้อหา */
+        .sidebar { width: var(--sidebar-w); background: white; border-right: 1px solid #e2e8f0; padding: 30px 15px; position: fixed; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; transition: 0.3s; z-index: 1000; }
         .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
         .rock-icon { width: 65px; height: 55px; background: var(--accent-blue); clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 5px 15px rgba(14, 165, 233, 0.2); margin-bottom: 12px; }
         .sidebar h1 { color: var(--navy-dark); text-align: center; margin: 0; font-weight: 800; font-size: 1.6rem; letter-spacing: -1px; text-transform: uppercase; }
         .shop-slogan { font-size: 0.75rem; color: #64748b; margin-top: -2px; text-align: center; font-weight: 400; }
 
         .category-item { padding: 12px 18px; margin: 5px 0; cursor: pointer; border-radius: 12px; transition: 0.3s; color: #64748b; display: flex; align-items: center; justify-content: space-between; font-size: 0.95rem; font-weight: 500; }
-        .category-item i { width: 25px; font-size: 1.1rem; }
         .category-item:hover, .category-item.active { background: #f0f9ff; color: var(--accent-blue); font-weight: 600; }
         .category-item::after { content: '\f105'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 0.8rem; opacity: 0.4; }
 
-        /* Main Content */
-        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 25px; display: flex; flex-direction: column; gap: 25px; transition: 0.3s; width: calc(100% - var(--sidebar-w)); box-sizing: border-box; }
+        /* Main Content: เพิ่ม Margin-left เพื่อไม่ให้โดน Sidebar บัง */
+        .main-content { flex: 1; margin-left: var(--sidebar-w); padding: 25px; display: flex; flex-direction: column; gap: 25px; transition: 0.3s; width: calc(100% - var(--sidebar-w)); box-sizing: border-box; min-height: 100vh; }
         
         /* Toolbar */
-        .toolbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 20px; border: 1px solid #e0f2fe; box-shadow: 0 8px 20px rgba(0,0,0,0.02); }
-        .search-box { display: flex; align-items: center; background: #f8fafc; border: 1px solid #bae6fd; border-radius: 12px; padding: 6px 15px; width: 45%; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 25px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .search-box { display: flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 6px 15px; width: 45%; }
         .search-box input { background: transparent; border: none; padding: 8px; width: 100%; outline: none; font-family: 'Kanit'; font-size: 0.9rem; }
 
         /* Product Cards */
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 24px; padding: 20px; text-align: center; border: 1px solid #f0f9ff; box-shadow: 0 10px 25px rgba(0,0,0,0.03); transition: 0.3s; position: relative; overflow: hidden; }
-        .card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(14,165,233,0.1); }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+        .card { background: white; border-radius: 24px; padding: 20px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.3s; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 12px 24px rgba(14,165,233,0.1); border-color: var(--accent-blue); }
         .card img { width: 100%; height: 160px; object-fit: contain; margin-bottom: 15px; border-radius: 15px; background: #f8fafc; padding: 10px; box-sizing: border-box; }
         
         .btn-group { display: flex; gap: 10px; margin-top: 15px; }
@@ -46,26 +45,18 @@
 
         /* Responsive Settings */
         .hamburger { display: none; font-size: 1.5rem; color: var(--deep-blue); cursor: pointer; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 999; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; backdrop-filter: blur(4px); }
 
         @media (max-width: 992px) {
             .sidebar { left: -100%; }
-            .sidebar.active { left: 0; }
-            .main-content { margin-left: 0; width: 100%; padding: 15px; }
+            .sidebar.active { left: 0; box-shadow: 15px 0 30px rgba(0,0,0,0.1); }
+            .main-content { margin-left: 0; width: 100%; padding: 20px; }
             .hamburger { display: block; }
-            .search-box { width: 40%; }
+            .search-box { display: none; } /* ซ่อนค้นหาในจอเล็กเพื่อประหยัดที่ */
             .overlay.active { display: block; }
         }
 
-        @media (max-width: 600px) {
-            .toolbar { padding: 10px 15px; }
-            .search-box { display: none; }
-            .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-            .card { padding: 12px; border-radius: 18px; }
-            .card img { height: 120px; }
-        }
-
-        footer { background: white; border-top: 1px solid #bae6fd; padding: 40px 20px; margin-top: 50px; text-align: center; width: 100%; box-sizing: border-box; }
+        footer { background: white; border-top: 1px solid #e2e8f0; padding: 40px 20px; margin-top: auto; text-align: center; width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -87,7 +78,6 @@
         <div class="category-item" onclick="filterCategory('ram', this)"><span><i class="fa-solid fa-hard-drive"></i> แรม</span></div>
         <div class="category-item" onclick="filterCategory('ssd', this)"><span><i class="fa-solid fa-database"></i> SSD</span></div>
         <div class="category-item" onclick="filterCategory('etc', this)"><span><i class="fa-solid fa-plug"></i> จิปาถะ</span></div>
-        <div style="flex-grow: 1;"></div>
     </div>
 
     <div class="main-content">
@@ -108,21 +98,20 @@
         </div>
 
         <div class="product-grid" id="product-list"></div>
+        
+        <footer>
+            <div style="font-weight: 800; color: var(--navy-dark); margin-bottom: 10px;">ROCKYSTORE CONTACT</div>
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; font-size: 0.9rem;">
+                <span><i class="fa-solid fa-phone" style="color:var(--accent-blue)"></i> 061-263-2933</span>
+                <span><i class="fa-solid fa-envelope" style="color:var(--accent-blue)"></i> RockHeart2548@gmail.com</span>
+            </div>
+            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 15px;">&copy; 2026 RockyStore Thailand. All Rights Reserved.</div>
+        </footer>
     </div>
-
-    <footer>
-        <div style="font-weight: 800; color: var(--navy-dark); margin-bottom: 15px;">ROCKYSTORE CONTACT</div>
-        <div style="display: flex; gap: 25px; justify-content: center; flex-wrap: wrap;">
-            <span style="font-weight: 600;"><i class="fa-solid fa-phone" style="color:var(--accent-blue)"></i> 061-263-2933</span>
-            <span style="font-weight: 600;"><i class="fa-solid fa-envelope" style="color:var(--accent-blue)"></i> RockHeart2548@gmail.com</span>
-        </div>
-        <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 20px;">&copy; 2026 RockyStore Thailand. All Rights Reserved.</div>
-    </footer>
 
     <script>
         let allProducts = [], cart = [];
 
-        // ฟังก์ชัน Toggle Sidebar สำหรับมือถือ
         function toggleMenu() {
             document.querySelector('.sidebar').classList.toggle('active');
             document.querySelector('.overlay').classList.toggle('active');
@@ -133,16 +122,14 @@
                 const res = await fetch('/api/products');
                 allProducts = await res.json();
                 updateUI('all');
-            } catch (err) { console.error("Error fetching products:", err); }
+            } catch (err) { console.error("Error:", err); }
         }
 
         function updateUI(category) {
-            const list = document.getElementById('product-list');
             const filtered = (category === 'all') ? allProducts : allProducts.filter(p => p.category === category);
             updateUI_List(filtered);
         }
 
-        // ฟังก์ชันอัปเดตรายการสินค้า (รองรับทั้งกรองและค้นหา)
         function updateUI_List(data) {
             const list = document.getElementById('product-list');
             const user = JSON.parse(localStorage.getItem('user'));
@@ -166,7 +153,6 @@
         function addToCart(id) {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user) return Swal.fire({ title: 'กรุณาล็อกอิน', text: 'ต้องเข้าสู่ระบบก่อนซื้อสินค้า', icon: 'warning', confirmButtonText: 'ไปหน้าล็อกอิน' }).then(r => { if(r.isConfirmed) window.location.href='/login.html' });
-            
             const p = allProducts.find(x => x._id === id);
             cart.push(p);
             document.getElementById('cart-count').innerText = cart.length;
@@ -193,7 +179,6 @@
             }).then((result) => { if (result.isConfirmed) processPayment(total); });
         }
 
-        // ฟังก์ชันชำระเงินและบันทึกออเดอร์
         async function processPayment(amount) {
             const user = JSON.parse(localStorage.getItem('user'));
             Swal.fire({ title: 'ยืนยันการชำระเงิน?', text: `ยอดรวม ${amount.toLocaleString()} ฿`, icon: 'question', showCancelButton: true, confirmButtonText: 'ยืนยัน' }).then(async (res) => {
@@ -234,7 +219,7 @@
             el.classList.add('active'); 
             document.getElementById('current-category').innerText = el.innerText; 
             updateUI(cat);
-            if(window.innerWidth <= 992) toggleMenu(); // ปิดเมนูอัตโนมัติหลังเลือกหมวดหมู่ในมือถือ
+            if(window.innerWidth <= 992) toggleMenu();
         }
         
         function searchProducts() {
