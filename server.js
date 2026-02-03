@@ -30,7 +30,6 @@ const Product = mongoose.model('Product', {
     stock: { type: Number, default: 10 } 
 });
 
-// เพิ่ม Schema สำหรับเก็บข้อมูลออเดอร์ (ประวัติการซื้อ)
 const Order = mongoose.model('Order', {
     username: String,
     items: [String], // รายชื่อสินค้าที่ถูกซื้อ
@@ -40,7 +39,7 @@ const Order = mongoose.model('Order', {
 
 // --- 4. API Routes ---
 
-// ดึงรายการสินค้าทั้งหมด หรือกรองตามหมวดหมู่
+// --- ส่วนที่ 1: จัดการสินค้า (Inventory) ---
 app.get('/api/products', async (req, res) => {
     try {
         const { category } = req.query;
@@ -72,7 +71,7 @@ app.delete('/api/products/:id', async (req, res) => {
     }
 });
 
-// ระบบสมาชิก
+// --- ส่วนที่ 2: ระบบสมาชิก (Auth & Management) ---
 app.post('/api/register', async (req, res) => {
     try {
         const newUser = new User(req.body);
@@ -87,9 +86,27 @@ app.post('/api/login', async (req, res) => {
     else res.status(401).json({ message: "ข้อมูลผิด" });
 });
 
-// --- ส่วนที่เพิ่มใหม่: ระบบออเดอร์และยอดขาย ---
+// ดึงข้อมูล User ทั้งหมดสำหรับ Admin Dashboard
+app.get('/api/users', async (req, res) => {
+    try {
+        const users = await User.find();
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ message: "ไม่สามารถดึงข้อมูลสมาชิกได้" });
+    }
+});
 
-// API บันทึกออเดอร์ใหม่เมื่อ User ชำระเงินสำเร็จ
+// ลบสมาชิกออกจากระบบ
+app.delete('/api/users/:id', async (req, res) => {
+    try {
+        await User.findByIdAndDelete(req.params.id);
+        res.json({ message: "ลบสมาชิกสำเร็จ" });
+    } catch (err) {
+        res.status(500).json({ message: "ลบสมาชิกไม่สำเร็จ" });
+    }
+});
+
+// --- ส่วนที่ 3: ระบบออเดอร์และยอดขาย ---
 app.post('/api/orders', async (req, res) => {
     try {
         const newOrder = new Order(req.body);
@@ -100,17 +117,15 @@ app.post('/api/orders', async (req, res) => {
     }
 });
 
-// API สำหรับ Admin ดึงประวัติออเดอร์ทั้งหมดเพื่อสรุปยอดขาย
 app.get('/api/orders', async (req, res) => {
     try {
-        const orders = await Order.find().sort({ date: -1 }); // เรียงจากล่าสุดไปเก่าสุด
+        const orders = await Order.find().sort({ date: -1 });
         res.json(orders);
     } catch (err) {
         res.status(500).json({ message: "ไม่สามารถดึงข้อมูลยอดขายได้" });
     }
 });
 
-// คงฟังก์ชันสั่งซื้อจำลองไว้ (หรือจะใช้ /api/orders แทนก็ได้)
 app.post('/api/purchase', (req, res) => {
     res.json({ status: "success", message: "สั่งซื้อสำเร็จ!" });
 });
