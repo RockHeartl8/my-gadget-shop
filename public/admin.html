@@ -15,7 +15,6 @@
         .admin-panel, .stats-card { background: var(--white); padding: 35px; border-radius: 24px; box-shadow: 0 15px 35px rgba(14, 165, 233, 0.08); border: 1px solid #e0f2fe; margin-bottom: 30px; }
         h2, h3 { color: var(--deep-blue); text-align: center; margin-bottom: 25px; font-weight: 800; }
 
-        /* ส่วนรายงานยอดขาย */
         .revenue-box { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 25px; }
         
         .filter-section { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 15px; }
@@ -25,8 +24,8 @@
         .sales-table th, .sales-table td { padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; }
         .sales-table th { color: var(--deep-blue); font-weight: 700; background: #f8fafc; }
         .low-sale { color: var(--danger-red); font-weight: 600; }
+        .price-sub { font-size: 0.85rem; color: var(--text-gray); font-weight: 400; }
 
-        /* ฟอร์มและรายการเดิม */
         .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px; }
         input, select { padding: 14px; border-radius: 12px; border: 1px solid #bae6fd; background: #f8fafc; color: #1e293b; font-family: 'Kanit'; outline: none; }
         .btn-add { grid-column: span 2; background: linear-gradient(90deg, var(--success-green), #34d399); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
@@ -46,15 +45,15 @@
         <div class="stats-card">
             <h3>📊 สรุปยอดจำหน่ายสินค้า</h3>
             <div class="revenue-box">
-                <div style="font-size: 0.9rem; opacity: 0.9;">ยอดรายได้รวมทั้งหมด</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">ยอดรายได้รวมทั้งหมดจากทุกออเดอร์</div>
                 <div id="total-revenue" style="font-size: 2.2rem; font-weight: 800;">0 ฿</div>
             </div>
 
             <div class="filter-section">
                 <label style="font-size: 0.9rem; color: var(--text-gray);">เรียงยอดขาย:</label>
                 <select id="sales-filter" class="filter-select" onchange="loadSalesStats()">
-                    <option value="asc">น้อยไปมาก ↑ (สินค้าค้างสต็อก)</option>
-                    <option value="desc">มากไปน้อย ↓ (สินค้าขายดี)</option>
+                    <option value="asc">น้อยไปมาก ↑</option>
+                    <option value="desc">มากไปน้อย ↓</option>
                 </select>
             </div>
             
@@ -64,6 +63,7 @@
                         <th>อันดับ</th>
                         <th>ชื่อสินค้า</th>
                         <th>จำนวนที่ขายได้</th>
+                        <th>ยอดเงินรวม</th>
                     </tr>
                 </thead>
                 <tbody id="sales-stats-list"></tbody>
@@ -96,31 +96,43 @@
         const user = JSON.parse(localStorage.getItem('user'));
         if (!user || user.role !== 'admin') window.location.href = '/login.html';
 
-        // ปรับปรุงฟังก์ชันดึงข้อมูลยอดขาย
+        // ปรับปรุงฟังก์ชันคำนวณยอดขายรายสินค้า
         async function loadSalesStats() {
             try {
+                // ดึงข้อมูลสินค้าทั้งหมดก่อนเพื่อเอามาหาราคา
+                const prodRes = await fetch('/api/products');
+                const allProds = await prodRes.json();
+                
                 const res = await fetch('/api/orders'); 
                 const orders = await res.json();
                 const filterType = document.getElementById('sales-filter').value;
                 
                 let revenue = 0;
-                let productCounts = {};
+                let productStats = {};
 
                 orders.forEach(order => {
                     revenue += (order.total || 0);
                     if (order.items && Array.isArray(order.items)) {
                         order.items.forEach(itemName => {
-                            productCounts[itemName] = (productCounts[itemName] || 0) + 1;
+                            if (!productStats[itemName]) {
+                                // หาราคาต่อชิ้นจากรายการสินค้าปัจจุบัน
+                                const productInfo = allProds.find(p => p.name === itemName);
+                                const unitPrice = productInfo ? productInfo.price : 0;
+                                productStats[itemName] = { count: 0, totalCash: 0, pricePerUnit: unitPrice };
+                            }
+                            productStats[itemName].count += 1;
+                            productStats[itemName].totalCash += productStats[itemName].pricePerUnit;
                         });
                     }
                 });
 
                 document.getElementById('total-revenue').innerText = `${revenue.toLocaleString()} ฿`;
 
-                // แปลงข้อมูลเพื่อจัดเรียงตาม Filter
-                const sortedStats = Object.keys(productCounts).map(name => ({
+                // จัดเรียงตามจำนวนที่ขายได้
+                const sortedStats = Object.keys(productStats).map(name => ({
                     name: name,
-                    count: productCounts[name]
+                    count: productStats[name].count,
+                    totalCash: productStats[name].totalCash
                 })).sort((a, b) => filterType === 'asc' ? a.count - b.count : b.count - a.count);
 
                 const listBody = document.getElementById('sales-stats-list');
@@ -129,12 +141,12 @@
                         <td>${index + 1}</td>
                         <td>${stat.name}</td>
                         <td class="${stat.count < 3 ? 'low-sale' : ''}">${stat.count} ชิ้น</td>
+                        <td style="font-weight:700; color:var(--deep-blue);">${stat.totalCash.toLocaleString()} ฿</td>
                     </tr>
-                `).join('') : '<tr><td colspan="3" style="text-align:center; padding:30px; color:#94a3b8;">ยังไม่มีข้อมูลการสั่งซื้อในระบบ</td></tr>';
+                `).join('') : '<tr><td colspan="4" style="text-align:center; padding:30px; color:#94a3b8;">ยังไม่มีข้อมูลการสั่งซื้อในระบบ</td></tr>';
             } catch (err) { console.error("Stats Error:", err); }
         }
 
-        // ฟังก์ชันจัดการสินค้าเดิมเป๊ะๆ (ห้ามลบ)
         async function addProduct() {
             const data = { 
                 name: document.getElementById('name').value, 
@@ -179,7 +191,6 @@
             });
         }
 
-        // รันทุกอย่างเมื่อโหลดหน้าสำเร็จ
         window.onload = () => { loadAdminItems(); loadSalesStats(); };
     </script>
 </body>
