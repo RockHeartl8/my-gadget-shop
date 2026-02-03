@@ -37,49 +37,23 @@
         .search-box input { background: transparent; border: none; padding: 8px; width: 100%; outline: none; font-family: 'Kanit'; font-size: 0.9rem; }
         .filter-sort { padding: 8px 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-family: 'Kanit'; color: #64748b; outline: none; font-size: 0.9rem; cursor: pointer; }
 
-        /* Best Seller Carousel (Updated) */
+        /* Best Seller Carousel */
         .hero-section { margin-bottom: 10px; }
-        
-        /* 1. เปิด Scrollbar ให้เห็นเส้นเลื่อน */
-        .carousel-container { 
-            display: flex; 
-            gap: 15px; 
-            overflow-x: auto; 
-            padding: 10px 5px 20px 5px; /* เพิ่ม Padding ล่างให้ Scrollbar ไม่ทับเนื้อหา */
-            scrollbar-width: thin; /* Firefox */
-        }
-        
-        /* ตกแต่งเส้นเลื่อนแนวนอน */
+        .carousel-container { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px 20px 5px; scrollbar-width: thin; }
         .carousel-container::-webkit-scrollbar { height: 6px; } 
         .carousel-container::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
         .carousel-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
 
-        /* ปรับ Layout การ์ดสินค้าขายดีให้เป็นแนวตั้งเพื่อใส่ปุ่ม */
-        .carousel-item { 
-            min-width: 220px; 
-            max-width: 220px;
-            background: white; 
-            border-radius: 18px; 
-            padding: 15px; 
-            border: 1px solid #e2e8f0; 
-            display: flex; 
-            flex-direction: column; /* เรียงลงมาแนวตั้ง */
-            align-items: center; 
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.02); 
-            transition: 0.3s; 
-        }
+        .carousel-item { min-width: 220px; max-width: 220px; background: white; border-radius: 18px; padding: 15px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.3s; }
         .carousel-item:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(14,165,233,0.1); border-color: var(--accent-blue); }
         .carousel-item img { width: 100px; height: 100px; object-fit: contain; background: #f8fafc; border-radius: 12px; padding: 10px; margin-bottom: 10px; }
-        
         .rank-badge { align-self: flex-start; background: #f43f5e; color: white; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-bottom: 5px; }
 
-        /* ปุ่มขนาดกะทัดรัดสำหรับ Carousel */
         .btn-group-sm { display: flex; gap: 5px; width: 100%; margin-top: 10px; }
         .btn-sm { flex: 1; padding: 6px 0; font-size: 0.75rem; border-radius: 8px; border: none; cursor: pointer; font-family: 'Kanit'; font-weight: 600; transition: 0.2s; }
         .btn-sm:hover { filter: brightness(0.95); }
 
-        /* Product Cards (Main Grid) */
+        /* Product Cards */
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
         .card { background: white; border-radius: 24px; padding: 20px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.3s; }
         .card:hover { transform: translateY(-8px); box-shadow: 0 12px 24px rgba(14,165,233,0.1); border-color: var(--accent-blue); }
@@ -163,7 +137,7 @@
         </div>
 
         <div class="hero-section">
-            <h4 style="margin:0 0 10px 5px; color:var(--navy-dark); display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-fire" style="color:#f43f5e;"></i> สินค้าขายดีประจำสัปดาห์ (Top 5)</h4>
+            <h4 style="margin:0 0 10px 5px; color:var(--navy-dark); display:flex; align-items:center; gap:8px;"><i class="fa-solid fa-fire" style="color:#f43f5e;"></i> สินค้าขายดีประจำสัปดาห์ (Top 3)</h4>
             <div class="carousel-container" id="best-seller-list"></div>
         </div>
 
@@ -192,21 +166,28 @@
             try {
                 const res = await fetch('/api/products');
                 allProducts = await res.json();
+                
+                // จำลอง Description สำหรับทุกสินค้า (เพราะใน DB จริงอาจจะยังไม่มีฟิลด์นี้)
+                allProducts = allProducts.map(p => ({
+                    ...p, 
+                    description: p.description || "สินค้าคุณภาพจาก RockyStore รับประกันศูนย์ไทย ของแท้ 100% พร้อมบริการหลังการขายที่ดีเยี่ยม"
+                }));
+
                 updateUI('all');
                 renderBestSellers(); 
             } catch (err) { console.error("Error:", err); }
         }
 
-        // ฟังก์ชันสร้างสินค้าขายดี พร้อมปุ่มกดที่พอดีคำ (Small Buttons)
+        // ฟังก์ชันสร้างสินค้าขายดี (จำกัดแค่ 3 อันดับแรก)
         function renderBestSellers() {
-            const top5 = [...allProducts].sort((a,b) => b.price - a.price).slice(0, 5);
+            // เรียงตามราคาและตัดเหลือแค่ 3 ชิ้น
+            const top3 = [...allProducts].sort((a,b) => b.price - a.price).slice(0, 3);
             const container = document.getElementById('best-seller-list');
             
-            // เช็คสิทธิ์ Admin เพื่อซ่อนปุ่มซื้อ
             const user = JSON.parse(localStorage.getItem('user'));
             const isAdmin = user && user.role === 'admin';
             
-            container.innerHTML = top5.map((p, i) => `
+            container.innerHTML = top3.map((p, i) => `
                 <div class="carousel-item">
                     <span class="rank-badge">อันดับ #${i+1}</span>
                     <img src="${p.img}" alt="${p.name}" onclick="viewDetail('${p._id}')" style="cursor:pointer">
@@ -230,8 +211,16 @@
         }
 
         function updateUI(category) {
-            currentFiltered = (category === 'all') ? [...allProducts] : allProducts.filter(p => p.category === category);
-            applySort();
+            // กรองข้อมูลตามหมวดหมู่
+            let filtered = (category === 'all') ? [...allProducts] : allProducts.filter(p => p.category === category);
+            
+            // ถ้าเป็นหมวด 'สินค้าทั้งหมด' ให้ตัดเหลือแค่ 20 ชิ้น
+            if (category === 'all') {
+                filtered = filtered.slice(0, 20);
+            }
+
+            currentFiltered = filtered;
+            applySort(); // เรียกใช้การเรียงลำดับต่อทันที
         }
 
         function applySort() {
@@ -275,9 +264,23 @@
             Swal.fire({ title: 'สำเร็จ!', text: `เพิ่ม ${p.name} แล้ว`, icon: 'success', timer: 800, showConfirmButton: false, toast: true, position: 'top-end' });
         }
 
+        // ฟังก์ชันดูรายละเอียด พร้อมแสดง Description เพิ่มเติม
         function viewDetail(id) {
             const p = allProducts.find(x => x._id === id);
-            Swal.fire({ title: p.name, html: `<div style="text-align:left;"><b>ราคา:</b> ${p.price.toLocaleString()} ฿<br><b>หมวดหมู่:</b> ${p.category}</div>`, imageUrl: p.img, imageWidth: 300, confirmButtonColor: '#0ea5e9' });
+            Swal.fire({ 
+                title: p.name, 
+                html: `
+                    <div style="text-align:left;">
+                        <div style="margin-bottom:10px; color:#64748b; font-size:0.9rem;">${p.description}</div>
+                        <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
+                        <b>ราคา:</b> ${p.price.toLocaleString()} ฿<br>
+                        <b>หมวดหมู่:</b> ${p.category}
+                    </div>
+                `, 
+                imageUrl: p.img, 
+                imageWidth: 300, 
+                confirmButtonColor: '#0ea5e9' 
+            });
         }
 
         function showCartItems() {
