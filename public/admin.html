@@ -10,7 +10,8 @@
     <style>
         :root { --bg-light: #f0f9ff; --accent-blue: #0ea5e9; --deep-blue: #0369a1; --white: #ffffff; --text-gray: #64748b; --success-green: #10b981; --danger-red: #f43f5e; --sidebar-w: 280px; }
         
-        body { font-family: 'Kanit', sans-serif; background: var(--bg-light); margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
+        /* [Security] ซ่อน Body ไว้ก่อน เพื่อไม่ให้เห็นเนื้อหาถ้าไม่ได้ล็อกอิน */
+        body { font-family: 'Kanit', sans-serif; background: var(--bg-light); margin: 0; display: none; min-height: 100vh; overflow-x: hidden; }
 
         /* Sidebar & Navigation */
         .sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid #e0f2fe; padding: 30px 20px; position: fixed; height: 100vh; box-sizing: border-box; transition: 0.3s; z-index: 1000; }
@@ -93,7 +94,7 @@
         <div id="sales" class="content-section active">
             <h2>📊 รายงานวิเคราะห์การขาย</h2>
             <div class="revenue-box">
-                <div style="font-size: 1rem; opacity: 0.9; margin-bottom: 5px;">รายได้รวมสะสมทั้งหมด</div>
+                <div style="font-size: 1rem; opacity: 0.9; margin-bottom: 5px;">รายได้รวมสะสมทั้งหมด (ไม่รวมสินค้าที่ถูกลบ)</div>
                 <h1 id="total-revenue" style="font-size: 2.5rem; font-weight: 800; margin:0;">0 ฿</h1>
             </div>
             
@@ -166,12 +167,19 @@
     </div>
 
     <script>
-        // Check Admin
+        // Check Admin [SECURITY UPDATE]
         const currentUser = JSON.parse(localStorage.getItem('user'));
-        if (!currentUser || currentUser.role !== 'admin') window.location.href = '/login.html';
+        
+        // ถ้าไม่มี user หรือไม่ใช่ admin ให้ดีดออกทันทีโดยไม่เก็บประวัติ (replace)
+        if (!currentUser || currentUser.role !== 'admin') {
+            window.location.replace('/login.html'); 
+        } else {
+            // ถ้าเป็น Admin ตัวจริง ค่อยโชว์หน้าเว็บ
+            document.body.style.display = 'flex';
+        }
 
-        let currentBase64 = null; // ตัวแปรเก็บรูป Base64
-        let globalProductList = []; // เก็บรายการสินค้าเพื่อดึงมาแก้ไข
+        let currentBase64 = null; 
+        let globalProductList = []; 
 
         function toggleMenu() {
             document.querySelector('.sidebar').classList.toggle('active');
@@ -186,7 +194,6 @@
             if(window.innerWidth <= 992) toggleMenu();
         }
 
-        // --- Image Conversion ---
         function previewFile() {
             const file = document.querySelector('input[type=file]').files[0];
             const reader = new FileReader();
@@ -207,13 +214,13 @@
                 let revenue = 0; let productStats = {};
                 
                 orders.forEach(order => {
-                    revenue += (order.total || 0); // เงินรวมยังคงนับจากออเดอร์จริง (Historical Data)
                     if (order.items) order.items.forEach(itemName => {
-                        // [UPDATE] เช็คก่อนว่าสินค้ายังมีอยู่ในคลังหรือไม่
                         const pInfo = allProds.find(p => p.name === itemName);
                         
-                        // ถ้ามีสินค้าในคลัง ให้คำนวณและแสดงผล (ถ้าถูกลบไปแล้ว จะข้ามส่วนนี้ไป)
+                        // คำนวณเฉพาะสินค้าที่ยังมีในคลัง
                         if (pInfo) {
+                            revenue += pInfo.price;
+
                             if (!productStats[itemName]) {
                                 productStats[itemName] = { count: 0, totalCash: 0, price: pInfo.price };
                             }
