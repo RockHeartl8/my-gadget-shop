@@ -35,13 +35,13 @@
         .sales-table th, .sales-table td { padding: 15px; text-align: left; border-bottom: 1px solid #f1f5f9; }
         .sales-table th { color: var(--deep-blue); background: #f8fafc; font-weight: 600; font-size: 0.9rem; }
 
-        /* Forms & Inputs (Updated for new features) */
+        /* Forms & Inputs */
         .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         input, select, textarea { padding: 12px 15px; border-radius: 10px; border: 1px solid #bae6fd; font-family: 'Kanit'; outline: none; transition: 0.3s; font-size: 0.95rem; width: 100%; box-sizing: border-box; }
         textarea { resize: vertical; min-height: 80px; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1); }
         
-        .full-width { grid-column: 1 / -1; } /* ให้ช่องรายละเอียดกว้างเต็มแถว */
+        .full-width { grid-column: 1 / -1; }
         
         .file-input-wrapper { position: relative; display: flex; gap: 10px; align-items: center; }
         .file-input-wrapper input[type="file"] { padding: 8px; background: white; font-size: 0.85rem; }
@@ -123,7 +123,8 @@
             <h2>📦 การจัดการสต็อกสินค้า</h2>
             <div class="card">
                 <h3 id="form-title" style="margin-top:0; font-size:1.1rem; color:var(--text-gray);">เพิ่มสินค้าใหม่</h3>
-                <input type="hidden" id="edit-id"> <div class="input-grid">
+                <input type="hidden" id="edit-id"> 
+                <div class="input-grid">
                     <input type="text" id="name" placeholder="ชื่อสินค้า (เช่น RTX 5050)">
                     <input type="number" id="price" placeholder="ราคาขาย (฿)">
                     <select id="category">
@@ -190,7 +191,7 @@
             const file = document.querySelector('input[type=file]').files[0];
             const reader = new FileReader();
             reader.addEventListener("load", function () {
-                currentBase64 = reader.result; // แปลงไฟล์เป็น Text Base64
+                currentBase64 = reader.result;
             }, false);
             if (file) reader.readAsDataURL(file);
         }
@@ -204,15 +205,21 @@
                 const filterType = document.getElementById('sales-filter').value;
                 
                 let revenue = 0; let productStats = {};
+                
                 orders.forEach(order => {
-                    revenue += (order.total || 0);
+                    revenue += (order.total || 0); // เงินรวมยังคงนับจากออเดอร์จริง (Historical Data)
                     if (order.items) order.items.forEach(itemName => {
-                        if (!productStats[itemName]) {
-                            const pInfo = allProds.find(p => p.name === itemName);
-                            productStats[itemName] = { count: 0, totalCash: 0, price: pInfo ? pInfo.price : 0 };
+                        // [UPDATE] เช็คก่อนว่าสินค้ายังมีอยู่ในคลังหรือไม่
+                        const pInfo = allProds.find(p => p.name === itemName);
+                        
+                        // ถ้ามีสินค้าในคลัง ให้คำนวณและแสดงผล (ถ้าถูกลบไปแล้ว จะข้ามส่วนนี้ไป)
+                        if (pInfo) {
+                            if (!productStats[itemName]) {
+                                productStats[itemName] = { count: 0, totalCash: 0, price: pInfo.price };
+                            }
+                            productStats[itemName].count++;
+                            productStats[itemName].totalCash += pInfo.price;
                         }
-                        productStats[itemName].count++;
-                        productStats[itemName].totalCash += productStats[itemName].price;
                     });
                 });
 
@@ -222,19 +229,16 @@
 
                 document.getElementById('sales-stats-list').innerHTML = sorted.map((s, i) => `
                     <tr><td>${i+1}</td><td>${s.name}</td><td>${s.count} ชิ้น</td><td style="font-weight:700; color:var(--deep-blue);">${s.totalCash.toLocaleString()} ฿</td></tr>
-                `).join('') || '<tr><td colspan="4" style="text-align:center; padding:20px;">ไม่มีข้อมูล</td></tr>';
+                `).join('') || '<tr><td colspan="4" style="text-align:center; padding:20px;">ไม่มีข้อมูลสินค้าในคลังที่มียอดขาย</td></tr>';
             } catch (e) { console.error(e); }
         }
 
-        // ฟังก์ชันเดียวใช้ทั้ง เพิ่ม และ แก้ไข
         async function saveProduct() {
             const id = document.getElementById('edit-id').value;
             const name = document.getElementById('name').value;
             const price = document.getElementById('price').value;
             const category = document.getElementById('category').value;
             const desc = document.getElementById('desc').value;
-            
-            // ใช้รูปจากไฟล์ที่อัปโหลด หรือถ้าไม่มีให้ใช้จากลิงก์ URL
             const img = currentBase64 || document.getElementById('img').value;
 
             if(!name || !price) return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกชื่อและราคา', 'warning');
@@ -244,9 +248,8 @@
             let url = '/api/products';
             let method = 'POST';
 
-            // ถ้ามี ID แปลว่ากำลังแก้ไข (ต้องไปเพิ่ม Route PUT ใน server.js)
             if (id) {
-                url = `/api/products/${id}`; // **ต้องเพิ่ม API PUT ใน Server**
+                url = `/api/products/${id}`;
                 method = 'PUT'; 
             }
 
@@ -259,7 +262,7 @@
 
                 if (res.ok) {
                     Swal.fire('สำเร็จ', id ? 'แก้ไขสินค้าแล้ว' : 'เพิ่มสินค้าแล้ว', 'success');
-                    cancelEdit(); // ล้างค่าในฟอร์ม
+                    cancelEdit();
                     loadAdminItems();
                 } else {
                     Swal.fire('ผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้', 'error');
@@ -269,7 +272,7 @@
 
         async function loadAdminItems() {
             const res = await fetch('/api/products');
-            globalProductList = await res.json(); // เก็บข้อมูลไว้ใช้ตอนกดแก้ไข
+            globalProductList = await res.json();
             document.getElementById('admin-display').innerHTML = globalProductList.map(p => `
                 <div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; margin-bottom:12px; gap:10px;">
                     <div style="flex:1;">
@@ -284,7 +287,6 @@
                 </div>`).join('');
         }
 
-        // เตรียมข้อมูลลงฟอร์มเมื่อกดแก้ไข
         function prepareEdit(id) {
             const p = globalProductList.find(item => item._id === id);
             if (!p) return;
@@ -294,16 +296,14 @@
             document.getElementById('name').value = p.name;
             document.getElementById('price').value = p.price;
             document.getElementById('category').value = p.category;
-            document.getElementById('img').value = p.img; // แสดง URL เดิม
+            document.getElementById('img').value = p.img;
             document.getElementById('desc').value = p.description || '';
-            currentBase64 = null; // รีเซ็ตรูปใหม่
+            currentBase64 = null;
 
-            // สลับปุ่ม
             document.getElementById('btn-add').style.display = 'none';
             document.getElementById('btn-update').style.display = 'block';
             document.getElementById('btn-cancel').style.display = 'block';
             
-            // เลื่อนจอไปที่ฟอร์ม
             document.querySelector('.content-section.active').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -323,7 +323,7 @@
         }
 
         async function deleteItem(id) {
-            const res = await Swal.fire({ title: 'ยืนยันการลบ?', text: "ข้อมูลสินค้านี้จะหายไปจากคลัง", icon: 'warning', showCancelButton: true, confirmButtonColor: '#f43f5e', confirmButtonText: 'ลบข้อมูล' });
+            const res = await Swal.fire({ title: 'ยืนยันการลบ?', text: "ข้อมูลสินค้านี้จะหายไปจากคลังและรายงานยอดจำหน่าย", icon: 'warning', showCancelButton: true, confirmButtonColor: '#f43f5e', confirmButtonText: 'ลบข้อมูล' });
             if (res.isConfirmed) { await fetch(`/api/products/${id}`, { method: 'DELETE' }); loadAdminItems(); loadSalesStats(); }
         }
 

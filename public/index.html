@@ -37,28 +37,14 @@
         .search-box input { background: transparent; border: none; padding: 8px; width: 100%; outline: none; font-family: 'Kanit'; font-size: 0.9rem; }
         .filter-sort { padding: 8px 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-family: 'Kanit'; color: #64748b; outline: none; font-size: 0.9rem; cursor: pointer; }
 
-        /* Best Seller Carousel (ปรับขนาดให้เล็กลง) */
+        /* Best Seller Carousel */
         .hero-section { margin-bottom: 5px; transition: 0.3s; }
         .carousel-container { display: flex; gap: 12px; overflow-x: auto; padding: 10px 5px 15px 5px; scrollbar-width: thin; }
         .carousel-container::-webkit-scrollbar { height: 5px; } 
         .carousel-container::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
         .carousel-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
 
-        /* ปรับขนาดการ์ดสินค้าขายดีให้เล็กลงตามสั่ง */
-        .carousel-item { 
-            min-width: 180px; /* ลดจาก 220px */
-            max-width: 180px;
-            background: white; 
-            border-radius: 16px; 
-            padding: 12px; 
-            border: 1px solid #e2e8f0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            text-align: center; 
-            box-shadow: 0 3px 8px rgba(0,0,0,0.02); 
-            transition: 0.3s; 
-        }
+        .carousel-item { min-width: 180px; max-width: 180px; background: white; border-radius: 16px; padding: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 3px 8px rgba(0,0,0,0.02); transition: 0.3s; }
         .carousel-item:hover { transform: translateY(-4px); box-shadow: 0 8px 15px rgba(14,165,233,0.15); border-color: var(--accent-blue); }
         .carousel-item img { width: 80px; height: 80px; object-fit: contain; background: #f8fafc; border-radius: 10px; padding: 8px; margin-bottom: 8px; }
         .rank-badge { align-self: flex-start; background: #f43f5e; color: white; padding: 2px 6px; border-radius: 5px; font-size: 0.65rem; font-weight: 700; margin-bottom: 5px; }
@@ -99,6 +85,13 @@
         }
 
         footer { background: white; border-top: 1px solid #e2e8f0; padding: 40px 20px; margin-top: auto; text-align: center; width: 100%; box-sizing: border-box; }
+        
+        /* Custom Swal Image Size */
+        .swal2-image {
+            max-height: 250px !important; /* บังคับความสูงรูปใน Popup ไม่ให้เกิน 250px */
+            object-fit: contain !important;
+            margin-top: 20px !important;
+        }
     </style>
 </head>
 <body>
@@ -181,7 +174,6 @@
                 const res = await fetch('/api/products');
                 allProducts = await res.json();
                 
-                // จำลอง Description สำหรับทุกสินค้า
                 allProducts = allProducts.map(p => ({
                     ...p, 
                     description: p.description || "สินค้าคุณภาพจาก RockyStore รับประกันศูนย์ไทย ของแท้ 100% พร้อมบริการหลังการขายที่ดีเยี่ยม"
@@ -223,19 +215,17 @@
         }
 
         function updateUI(category) {
-            // Logic ซ่อน/แสดง สินค้าขายดี
             const heroSection = document.getElementById('hero-section');
             if (category === 'all') {
-                heroSection.style.display = 'block'; // แสดงเฉพาะหมวด 'สินค้าทั้งหมด'
+                heroSection.style.display = 'block'; 
             } else {
-                heroSection.style.display = 'none'; // ซ่อนในหมวดอื่นๆ
+                heroSection.style.display = 'none'; 
             }
 
-            // กรองข้อมูล
             let filtered = (category === 'all') ? [...allProducts] : allProducts.filter(p => p.category === category);
             
             if (category === 'all') {
-                filtered = filtered.slice(0, 20); // จำกัด 20 ชิ้น
+                filtered = filtered.slice(0, 20); 
             }
 
             currentFiltered = filtered;
@@ -283,7 +273,7 @@
             Swal.fire({ title: 'สำเร็จ!', text: `เพิ่ม ${p.name} แล้ว`, icon: 'success', timer: 800, showConfirmButton: false, toast: true, position: 'top-end' });
         }
 
-        // เพิ่มคำว่า "รายละเอียดสินค้า:" ใน Popup
+        // ปรับขนาดรูปใน Popup ให้พอดี (ไม่เกิน 250px)
         function viewDetail(id) {
             const p = allProducts.find(x => x._id === id);
             Swal.fire({ 
@@ -298,8 +288,11 @@
                     </div>
                 `, 
                 imageUrl: p.img, 
-                imageWidth: 300, 
-                confirmButtonColor: '#0ea5e9' 
+                // imageWidth ไม่ต้องใส่ เพราะเราใช้ CSS Class .swal2-image คุมความสูงแทนแล้ว
+                confirmButtonColor: '#0ea5e9',
+                customClass: {
+                    image: 'swal2-image-custom' // ใช้คลาสพิเศษถ้าต้องการ หรือใช้ Default ของ Swal ที่เรา Override ไว้ใน <style>
+                }
             });
         }
 
